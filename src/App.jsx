@@ -36,7 +36,9 @@ import {
   Calculator,
   ShieldCheck,
   CreditCard,
-  Building2
+  Building2,
+  Bot,
+  QrCode
 } from 'lucide-react';
 
 export default function App() {
@@ -789,8 +791,8 @@ export default function App() {
       {/* SIDEBAR NAVIGATION */}
       <aside className="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 border-r border-slate-800">
         <div className="p-5 border-b border-slate-800 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xl">
-            🤖
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+            <Bot className="w-5 h-5" />
           </div>
           <div>
             <h1 className="font-bold text-base text-white tracking-wide">Copper Golem POS</h1>
@@ -1517,7 +1519,7 @@ export default function App() {
                       </h3>
                       <p className="text-xs text-slate-500">
                         {taxSummary.vat.is_required
-                          ? '⚠️ รายรับเกิน 1.8 ล้านบาทแล้ว มีหน้าที่ต้องจดทะเบียนภาษีมูลค่าเพิ่ม (ภ.พ.20) ภายใน 30 วัน'
+                          ? 'รายรับเกิน 1.8 ล้านบาทแล้ว มีหน้าที่ต้องจดทะเบียนภาษีมูลค่าเพิ่ม (ภ.พ.20) ภายใน 30 วัน'
                           : `ยังไม่ต้องจด VAT (เหลือยอดขายอีก ฿${taxSummary.vat.remaining_limit.toLocaleString()} ก่อนถึงเกณฑ์ 1.8M)`}
                       </p>
                     </div>
@@ -2645,7 +2647,9 @@ export default function App() {
 
               {paymentMethod === 'TRANSFER_QR' && (
                 <div className="p-4 bg-purple-50 border border-purple-200 rounded-2xl text-center space-y-2">
-                  <div className="text-2xl">📱</div>
+                  <div className="w-10 h-10 mx-auto rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                    <QrCode className="w-5 h-5" />
+                  </div>
                   <h4 className="font-bold text-xs text-purple-900">ให้ลูกค้าสแกน QR Code ประจำร้าน</h4>
                   <p className="text-[11px] text-purple-700">
                     ยอดเงิน: <span className="font-bold text-sm">฿{cartTotalAmount.toFixed(2)}</span>
