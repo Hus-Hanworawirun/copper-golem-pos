@@ -17,8 +17,60 @@ function seedDatabase() {
   const sampleProducts = [
     {
       barcode: '885012345601',
+      name: 'กาแฟอาราบิกาคั่วบด 250g',
+      category: 'เครื่องดื่ม',
+      image_url: '',
+      pack_cost: 960,
+      pack_qty: 6,
+      cost_price: 160,
+      profit_margin: 60,
+      sell_price: 220,
+      stock_qty: 18,
+      min_stock: 5
+    },
+    {
+      barcode: '885012345602',
+      name: 'มันฝรั่งทอดกรอบ รสเกลือ (แพ็ค 6 ซอง)',
+      category: 'ขนม/ของทานเล่น',
+      image_url: '',
+      pack_cost: 360,
+      pack_qty: 12,
+      cost_price: 30,
+      profit_margin: 15,
+      sell_price: 45,
+      stock_qty: 24,
+      min_stock: 6
+    },
+    {
+      barcode: '885012345603',
+      name: 'กระดาษถ่ายเอกสาร A4 80g (รีม)',
+      category: 'เครื่องเขียน/สำนักงาน',
+      image_url: '',
+      pack_cost: 550,
+      pack_qty: 5,
+      cost_price: 110,
+      profit_margin: 35,
+      sell_price: 145,
+      stock_qty: 15,
+      min_stock: 4
+    },
+    {
+      barcode: '885012345604',
+      name: 'น้ำยาทำความสะอาดอเนกประสงค์ 500ml',
+      category: 'ของใช้ในบ้าน',
+      image_url: '',
+      pack_cost: 480,
+      pack_qty: 8,
+      cost_price: 60,
+      profit_margin: 29,
+      sell_price: 89,
+      stock_qty: 20,
+      min_stock: 5
+    },
+    {
+      barcode: '885012345605',
       name: 'อาหารแมวกระป๋อง ทูน่ามูส (80g)',
-      category: 'อาหารสัตว์',
+      category: 'สินค้าสัตว์เลี้ยง',
       image_url: '',
       pack_cost: 1200,
       pack_qty: 30,
@@ -27,58 +79,6 @@ function seedDatabase() {
       sell_price: 45,
       stock_qty: 30,
       min_stock: 5
-    },
-    {
-      barcode: '885012345602',
-      name: 'ขนมแมวเลีย รสแซลมอน (แพ็ค 4 ซอง)',
-      category: 'ขนมสัตว์เลี้ยง',
-      image_url: '',
-      pack_cost: 400,
-      pack_qty: 10,
-      cost_price: 40,
-      profit_margin: 10,
-      sell_price: 50,
-      stock_qty: 25,
-      min_stock: 5
-    },
-    {
-      barcode: '885012345603',
-      name: 'ทรายแมวภูเขาไฟ ไร้ฝุ่น 10L',
-      category: 'ของใช้สัตว์เลี้ยง',
-      image_url: '',
-      pack_cost: 650,
-      pack_qty: 5,
-      cost_price: 130,
-      profit_margin: 40,
-      sell_price: 170,
-      stock_qty: 15,
-      min_stock: 3
-    },
-    {
-      barcode: '885012345604',
-      name: 'ปลอกคอแมวนิรภัย กระดิ่งทอง',
-      category: 'อุปกรณ์สัตว์เลี้ยง',
-      image_url: '',
-      pack_cost: 300,
-      pack_qty: 12,
-      cost_price: 25,
-      profit_margin: 20,
-      sell_price: 45,
-      stock_qty: 20,
-      min_stock: 4
-    },
-    {
-      barcode: '885012345605',
-      name: 'แชมพูอาบน้ำสูตรอ่อนโยน 250ml',
-      category: 'ของใช้สัตว์เลี้ยง',
-      image_url: '',
-      pack_cost: 800,
-      pack_qty: 10,
-      cost_price: 80,
-      profit_margin: 39,
-      sell_price: 119,
-      stock_qty: 12,
-      min_stock: 3
     }
   ];
 

@@ -63,7 +63,7 @@ export default function App() {
   const [productForm, setProductForm] = useState({
     name: '',
     barcode: '',
-    category: 'อาหารสัตว์',
+    category: 'ทั่วไป',
     pack_cost: '',
     pack_qty: '',
     cost_price: '',
@@ -459,7 +459,7 @@ export default function App() {
     setProductForm({
       name: '',
       barcode: `885${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`,
-      category: 'อาหารสัตว์',
+      category: 'ทั่วไป',
       pack_cost: '',
       pack_qty: '',
       cost_price: '',
@@ -2365,14 +2365,28 @@ export default function App() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-700">หมวดหมู่</label>
+                  <label className="text-xs font-semibold text-slate-700">หมวดหมู่สินค้า</label>
                   <input
                     type="text"
-                    placeholder="เช่น อาหารสัตว์, ขนม, ของใช้"
+                    list="retail-categories"
+                    placeholder="เช่น ทั่วไป, เครื่องดื่ม, ขนม, ของใช้"
                     value={productForm.category}
                     onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   />
+                  <datalist id="retail-categories">
+                    <option value="ทั่วไป" />
+                    <option value="อาหาร/เครื่องดื่ม" />
+                    <option value="ขนม/ของทานเล่น" />
+                    <option value="ของใช้ในบ้าน" />
+                    <option value="เครื่องเขียน/สำนักงาน" />
+                    <option value="เสื้อผ้า/แฟชั่น" />
+                    <option value="สุขภาพและความงาม" />
+                    <option value="สินค้าสัตว์เลี้ยง" />
+                    <option value="ของเล่น/ของสะสม" />
+                    <option value="อิเล็กทรอนิกส์/แกดเจ็ต" />
+                    <option value="เบ็ดเตล็ด" />
+                  </datalist>
                 </div>
               </div>
 
@@ -2794,7 +2808,7 @@ export default function App() {
               return (
                 <div className="p-6 space-y-4 font-mono text-xs text-slate-700">
                   <div className="text-center space-y-1">
-                    <h3 className="font-bold text-sm text-slate-900 font-sans">ร้านค้าสัตว์เลี้ยง & ค้าปลีก</h3>
+                    <h3 className="font-bold text-sm text-slate-900 font-sans">ร้านค้าทั่วไป (Copper Golem POS)</h3>
                     <p className="text-[10px] text-slate-400 font-mono">เลขที่บิล: {ord.order_no}</p>
                     <p className="text-[10px] text-slate-400">
                       {new Date(ord.created_at).toLocaleString('th-TH')}
