@@ -850,11 +850,16 @@ export default function App() {
           <span className="text-xs text-slate-300 font-medium">พร้อมยิงบาร์โค้ด USB</span>
         </div>
 
-        <nav className="flex-1 px-3 py-2 space-y-1.5">
-          {/* Tab 1: POS */}
+        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+          {/* Group 1: หน้าร้าน & คลัง */}
+          <div className="pt-1 pb-1 px-2 text-[10px] uppercase font-bold tracking-wider text-slate-500">
+            ระบบหน้าร้าน & คลังสินค้า
+          </div>
+
+          {/* 1. ขายหน้าร้าน (Cashier) */}
           <button
             onClick={() => setActiveTab('pos')}
-            className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all ${
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
               activeTab === 'pos'
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
                 : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
@@ -869,10 +874,10 @@ export default function App() {
             )}
           </button>
 
-          {/* Tab 2: Inventory */}
+          {/* 2. คลังสินค้า & ต้นทุน (Inventory) */}
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all ${
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
               activeTab === 'inventory'
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
                 : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
@@ -882,13 +887,34 @@ export default function App() {
             <span>คลังสินค้า & ต้นทุน</span>
           </button>
 
-          {/* Tab 3: Digital Receipts */}
+          {/* Group 2: รายงาน & บัญชี */}
+          <div className="pt-3 pb-1 px-2 text-[10px] uppercase font-bold tracking-wider text-slate-500">
+            บัญชี & สรุปผลกำไร
+          </div>
+
+          {/* 3. ภาพรวมกำไร-ขาดทุน (P&L Analytics) */}
+          <button
+            onClick={() => {
+              setActiveTab('accounting');
+              fetchAccountingData();
+            }}
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+              activeTab === 'accounting'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+            }`}
+          >
+            <BarChart3 className="w-5 h-5" />
+            <span>ภาพรวมกำไร-ขาดทุน</span>
+          </button>
+
+          {/* 4. ประวัติใบเสร็จดิจิทัล (Receipts Log) */}
           <button
             onClick={() => {
               setActiveTab('receipts');
               fetchAccountingData();
             }}
-            className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all ${
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
               activeTab === 'receipts'
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
                 : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
@@ -903,13 +929,13 @@ export default function App() {
             )}
           </button>
 
-          {/* Tab 4: Thai Tax & Revenue */}
+          {/* 5. บัญชีภาษีสรรพากร (Tax Compliance) */}
           <button
             onClick={() => {
               setActiveTab('tax');
               fetchTaxData();
             }}
-            className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all ${
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
               activeTab === 'tax'
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
                 : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
@@ -920,22 +946,6 @@ export default function App() {
             <span className="ml-auto bg-amber-400/20 text-amber-300 text-[10px] font-bold px-1.5 py-0.5 rounded">
               ม.40(8)
             </span>
-          </button>
-
-          {/* Tab 5: Accounting & Reports */}
-          <button
-            onClick={() => {
-              setActiveTab('accounting');
-              fetchAccountingData();
-            }}
-            className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all ${
-              activeTab === 'accounting'
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
-                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-            }`}
-          >
-            <BarChart3 className="w-5 h-5" />
-            <span>ภาพรวมกำไร-ขาดทุน</span>
           </button>
         </nav>
 
