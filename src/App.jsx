@@ -789,12 +789,12 @@ export default function App() {
       {/* SIDEBAR NAVIGATION */}
       <aside className="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 border-r border-slate-800">
         <div className="p-5 border-b border-slate-800 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xl">
-            🐾
+          <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xl">
+            🤖
           </div>
           <div>
-            <h1 className="font-bold text-base text-white tracking-wide">POS & Stock Pro</h1>
-            <p className="text-xs text-slate-400">ระบบแคชเชียร์ & บัญชีสต็อก</p>
+            <h1 className="font-bold text-base text-white tracking-wide">Copper Golem POS</h1>
+            <p className="text-xs text-amber-400/80">ระบบแคชเชียร์ & คลังสต็อก</p>
           </div>
         </div>
 

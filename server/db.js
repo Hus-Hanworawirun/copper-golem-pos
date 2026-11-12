@@ -4,7 +4,7 @@ const fs = require('fs');
 
 function getStorageDir() {
   if (process.env.APPDATA) {
-    const appDataPath = path.join(process.env.APPDATA, 'NewPOS', 'data');
+    const appDataPath = path.join(process.env.APPDATA, 'CopperGolemPOS', 'data');
     if (!fs.existsSync(appDataPath)) {
       fs.mkdirSync(appDataPath, { recursive: true });
     }

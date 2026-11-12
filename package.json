@@ -1,7 +1,7 @@
 {
-  "name": "newpos",
+  "name": "copper-golem-pos",
   "version": "1.0.0",
-  "description": "Retail POS and Stock Accounting System",
+  "description": "Copper Golem POS - Desktop Retail POS and Stock Accounting System",
   "main": "electron-main.js",
   "scripts": {
     "start": "node server/index.js",
@@ -13,8 +13,8 @@
     "build:exe": "npm run build && electron-builder --win"
   },
   "build": {
-    "appId": "com.newpos.desktop",
-    "productName": "POS & Stock Pro",
+    "appId": "com.coppergolem.pos",
+    "productName": "Copper Golem POS",
     "directories": {
       "output": "release"
     },
@@ -46,7 +46,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "POS & Stock Pro"
+      "shortcutName": "Copper Golem POS"
     }
   },
   "keywords": [],

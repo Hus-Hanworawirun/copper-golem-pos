@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5001;
 // Upload directory setup (persists in %APPDATA%\NewPOS\uploads on Windows)
 function getUploadsDir() {
   if (process.env.APPDATA) {
-    const appDataUploads = path.join(process.env.APPDATA, 'NewPOS', 'uploads');
+    const appDataUploads = path.join(process.env.APPDATA, 'CopperGolemPOS', 'uploads');
     if (!fs.existsSync(appDataUploads)) {
       fs.mkdirSync(appDataUploads, { recursive: true });
     }

@@ -16,7 +16,7 @@ function createWindow() {
     height: 800,
     minWidth: 1024,
     minHeight: 700,
-    title: 'POS & Stock Pro',
+    title: 'Copper Golem POS',
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
