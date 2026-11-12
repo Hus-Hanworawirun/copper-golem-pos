@@ -1,0 +1,8 @@
+node_modules/
+dist/
+release/
+data/pos.db
+data/pos.db-wal
+data/pos.db-shm
+.env
+*.log

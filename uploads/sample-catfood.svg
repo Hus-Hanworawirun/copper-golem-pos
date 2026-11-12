@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#f0fdf4" rx="16"/>
+  <circle cx="100" cy="85" r="50" fill="#bbf7d0"/>
+  <text x="100" y="95" font-size="44" text-anchor="middle">🥫</text>
+  <text x="100" y="150" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="#166534" text-anchor="middle">Cat Can 80g</text>
+</svg>
