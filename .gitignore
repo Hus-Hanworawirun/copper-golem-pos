@@ -4,5 +4,7 @@ release/
 data/pos.db
 data/pos.db-wal
 data/pos.db-shm
+uploads/*
+!uploads/.gitkeep
 .env
 *.log

@@ -809,6 +809,28 @@ app.get('/api/tax/summary', (req, res) => {
   }
 });
 
+// ---------------- SYSTEM DATA MANAGEMENT API ----------------
+const { clearDatabase } = require('./clear');
+const { seedDatabase } = require('./seed');
+
+app.post('/api/system/clear', (req, res) => {
+  try {
+    clearDatabase();
+    res.json({ success: true, message: 'ล้างข้อมูลทั้งหมดในระบบเรียบร้อย (100% Clean State)' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/system/seed', (req, res) => {
+  try {
+    seedDatabase();
+    res.json({ success: true, message: 'สร้างข้อมูลจำลอง (Mockup Data) สำเร็จ 5 รายการ' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Serve frontend build if available
 const distPath = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(distPath)) {

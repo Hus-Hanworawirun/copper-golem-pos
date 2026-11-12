@@ -10,7 +10,9 @@
     "dev": "concurrently \"node server/index.js\" \"vite\"",
     "electron": "electron electron-main.js",
     "build": "vite build",
-    "build:exe": "npm run build && electron-builder --win"
+    "build:exe": "npm run build && electron-builder --win",
+    "db:clear": "node server/clear.js",
+    "db:seed": "node server/seed.js"
   },
   "build": {
     "appId": "com.coppergolem.pos",
