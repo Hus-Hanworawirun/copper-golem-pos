@@ -1,0 +1,234 @@
+import React, { useEffect, useRef } from 'react';
+import JsBarcode from 'jsbarcode';
+
+export default function BarcodeModal({
+  isOpen,
+  onClose,
+  product,
+  printCopies,
+  setPrintCopies
+}) {
+  const barcodeSvgRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && product && barcodeSvgRef.current) {
+      try {
+        const code = product.barcode || `${product.id}`;
+        JsBarcode(barcodeSvgRef.current, code, {
+          format: 'CODE128',
+          lineColor: '#000000',
+          width: 2,
+          height: 60,
+          displayValue: true,
+          fontSize: 14,
+          font: 'monospace',
+          margin: 10,
+          background: '#ffffff'
+        });
+      } catch (e) {
+        console.error('JsBarcode render error:', e);
+      }
+    }
+  }, [isOpen, product]);
+
+  if (!isOpen || !product) return null;
+
+  const handleDownloadPng = () => {
+    const svg = barcodeSvgRef.current;
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const svgSize = svg.getBoundingClientRect();
+    canvas.width = svgSize.width * 2 || 600;
+    canvas.height = svgSize.height * 2 || 240;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const img = new Image();
+    img.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData))));
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const pngFile = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.download = `Barcode_${product.name}_${product.barcode || product.id}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+  };
+
+  const handlePrintLabels = () => {
+    const printWindow = window.open('', '_blank');
+    const copies = parseInt(printCopies, 10) || 1;
+    const svgHtml = barcodeSvgRef.current ? barcodeSvgRef.current.outerHTML : '';
+
+    let stickersHtml = '';
+    for (let i = 0; i < copies; i++) {
+      stickersHtml += `
+        <div class="sticker">
+          <div class="title">${product.name}</div>
+          <div class="barcode">${svgHtml}</div>
+          <div class="price">฿${product.sell_price.toFixed(2)}</div>
+        </div>
+      `;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>พิมพ์บาร์โค้ด - ${product.name}</title>
+          <style>
+            @page { margin: 5mm; size: auto; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 10px; }
+            .grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+            .sticker {
+              width: 50mm;
+              height: 32mm;
+              border: 1px dashed #ccc;
+              box-sizing: border-box;
+              padding: 4px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: space-between;
+              text-align: center;
+              page-break-inside: avoid;
+            }
+            .title { font-size: 11px; font-weight: bold; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100%; }
+            .barcode { max-width: 100%; overflow: hidden; }
+            .barcode svg { width: 100%; height: 35px; }
+            .price { font-size: 14px; font-weight: 800; color: #000; }
+          </style>
+        </head>
+        <body>
+          <div class="grid">${stickersHtml}</div>
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+      <div className="bg-surface rounded-3xl max-w-md w-full border border-surface-container-high shadow-2xl overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="p-5 border-b border-surface-container-high flex items-center justify-between bg-surface-container-low">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary-container text-white flex items-center justify-center">
+              <span className="material-symbols-outlined text-[18px]">barcode</span>
+            </div>
+            <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">
+              พิมพ์สติกเกอร์บาร์โค้ด Code 128
+            </h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors"
+            type="button"
+          >
+            <span className="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-3 p-3 bg-surface-container-lowest rounded-2xl border border-surface-container-high">
+            <div className="w-12 h-12 rounded-xl bg-surface-container overflow-hidden flex items-center justify-center shrink-0">
+              {product.image_url ? (
+                <img src={product.image_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="material-symbols-outlined text-[24px] text-outline">inventory_2</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <h4 className="font-bold text-sm text-on-surface truncate">{product.name}</h4>
+              <p className="text-xs text-on-surface-variant font-mono">รหัส: {product.barcode || product.id}</p>
+            </div>
+          </div>
+
+          {/* Barcode Sticker Preview */}
+          <div className="flex flex-col items-center justify-center p-4 bg-white border-2 border-dashed border-outline-variant rounded-2xl shadow-inner text-center">
+            <span className="text-xs font-bold text-on-surface line-clamp-1 mb-1">
+              {product.name}
+            </span>
+
+            <div className="my-1 bg-white p-2">
+              <svg ref={barcodeSvgRef} id="barcode-svg" className="max-w-full"></svg>
+            </div>
+
+            <span className="text-base font-extrabold text-primary font-mono">
+              ฿{product.sell_price.toFixed(2)}
+            </span>
+            <span className="text-[10px] text-on-surface-variant mt-0.5">
+              ตัวอย่างสติกเกอร์ขนาด 50x30mm พร้อมติดสินค้า
+            </span>
+          </div>
+
+          {/* Copies Selector */}
+          <div className="p-4 bg-surface-container-low rounded-2xl border border-surface-container-high space-y-2">
+            <div className="flex items-center justify-between text-xs font-semibold text-on-surface">
+              <span>จำนวนดวงที่ต้องการพิมพ์:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min="1"
+                  max="500"
+                  value={printCopies}
+                  onChange={(e) => setPrintCopies(e.target.value)}
+                  className="w-16 px-2.5 py-1 text-center font-bold bg-surface-container-lowest border border-surface-container-high rounded-lg text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container"
+                />
+                <span className="text-on-surface-variant text-xs">ดวง</span>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              {[1, 10, 30, product.stock_qty].filter((v, i, a) => v > 0 && a.indexOf(v) === i).map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setPrintCopies(num)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                    printCopies === num
+                      ? 'bg-primary-container text-white border-primary-container shadow-sm'
+                      : 'bg-surface-container-lowest text-on-surface border-surface-container-high hover:bg-surface-container'
+                  }`}
+                >
+                  {num === product.stock_qty ? `ตามสต็อก (${num})` : `${num} ดวง`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <button
+              type="button"
+              onClick={handleDownloadPng}
+              className="py-2.5 px-4 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-colors border border-surface-container-high"
+            >
+              <span className="material-symbols-outlined text-[16px]">download</span>
+              <span>โหลดรูป PNG</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handlePrintLabels}
+              className="py-2.5 px-4 bg-primary-container hover:bg-primary text-white rounded-full font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-primary-container/30 transition-all active:scale-95"
+            >
+              <span className="material-symbols-outlined text-[16px]">print</span>
+              <span>พิมพ์แผ่นสติกเกอร์</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
