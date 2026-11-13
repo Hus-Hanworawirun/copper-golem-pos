@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import SubHeader from './components/SubHeader';
 import Footer from './components/Footer';
@@ -86,7 +86,7 @@ export default function App() {
       osc.start();
       osc.stop(audioCtx.currentTime + 0.1);
     } catch (e) {
-      // AudioContext not allowed before user interaction
+      // Ignore before user interaction
     }
   };
 
@@ -193,7 +193,6 @@ export default function App() {
     let lastKeyTime = Date.now();
 
     const handleKeyDown = (e) => {
-      // Don't intercept typing in inputs
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) {
         return;
       }
@@ -579,8 +578,8 @@ export default function App() {
   const currentRevenue = taxSummary?.total_revenue || 0;
 
   return (
-    <div className="min-h-screen w-full bg-background text-on-surface antialiased font-['Plus_Jakarta_Sans','Prompt',sans-serif] flex flex-col">
-      {/* 1. FIXED TOP HEADER */}
+    <div className="h-screen w-screen flex flex-col overflow-hidden bg-background text-on-surface antialiased font-['Plus_Jakarta_Sans','Prompt',sans-serif]">
+      {/* 1. TOP HEADER (Fixed height, shrink-0) */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -589,14 +588,14 @@ export default function App() {
         productsCount={products.length}
       />
 
-      {/* 2. SUBHEADER BAR */}
+      {/* 2. SUBHEADER BAR (Fixed height, shrink-0) */}
       <SubHeader
         onRefreshTax={fetchTaxData}
         cashDrawerAmount={5000 + (orderHistory.filter(o => o.payment_method === 'CASH').reduce((s, o) => s + (o.total_amount || 0), 0))}
       />
 
-      {/* 3. MAIN WORKSPACE */}
-      <main className="w-full pt-32 pb-14 bg-background min-h-screen flex-1 flex flex-col">
+      {/* 3. MAIN WORKSPACE (Flex-1 min-h-0 overflow-y-auto) */}
+      <main className="flex-1 min-h-0 overflow-y-auto bg-background flex flex-col">
         {activeTab === 'pos' && (
           <CashierTab
             products={products}
@@ -664,7 +663,7 @@ export default function App() {
         )}
       </main>
 
-      {/* 4. FIXED BOTTOM TELEMETRY FOOTER */}
+      {/* 4. BOTTOM TELEMETRY FOOTER (Fixed height, shrink-0) */}
       <Footer currentRevenue={currentRevenue} />
 
       {/* 5. MODALS */}

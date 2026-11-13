@@ -1,44 +1,46 @@
 import React from 'react';
+import { Store, Clock, Coins, RefreshCw, Lock } from 'lucide-react';
 
 export default function SubHeader({ onRefreshTax, cashDrawerAmount = 5000 }) {
   return (
-    <div className="fixed top-20 xl:top-20 left-0 right-0 z-40 h-11 w-full px-margin bg-surface-container-low border-b border-surface-container-high flex items-center justify-between shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-      <div className="flex items-center gap-space-md overflow-x-auto scrollbar-none py-1">
-        <div className="flex items-center gap-space-xs shrink-0">
-          <span className="material-symbols-outlined text-[16px] text-primary">storefront</span>
-          <span className="font-label-md text-label-md text-on-surface font-semibold">สาขา 01 (สยามพารากอน)</span>
+    <div className="h-10 w-full shrink-0 bg-surface-container-low border-b border-surface-container-high px-4 lg:px-6 flex items-center justify-between text-xs shadow-[0_1px_2px_rgba(0,0,0,0.02)] z-20">
+      <div className="flex items-center gap-3 overflow-x-auto scrollbar-none py-1">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Store className="w-3.5 h-3.5 text-primary" />
+          <span className="font-semibold text-on-surface">สาขา 01 (สยามพารากอน)</span>
         </div>
-        <span className="text-outline-variant font-label-sm text-label-sm shrink-0">•</span>
-        <div className="flex items-center gap-space-xs shrink-0">
-          <span className="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
-          <span className="font-label-md text-label-md text-on-surface-variant">กะปัจจุบัน: รอบเช้า 08:30 - 16:30</span>
+        <span className="text-outline-variant shrink-0">•</span>
+        <div className="flex items-center gap-1.5 shrink-0 text-on-surface-variant">
+          <Clock className="w-3.5 h-3.5" />
+          <span>กะเช้า 08:30 - 16:30</span>
         </div>
-        <span className="text-outline-variant font-label-sm text-label-sm shrink-0">•</span>
-        <div className="flex items-center gap-space-xs shrink-0">
-          <span className="font-label-sm text-label-sm text-on-surface-variant">แคชลิ้นชัก:</span>
-          <span className="font-label-md text-label-md text-on-surface font-semibold">
+        <span className="text-outline-variant shrink-0">•</span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Coins className="w-3.5 h-3.5 text-amber-500" />
+          <span className="text-on-surface-variant">แคชลิ้นชัก:</span>
+          <span className="font-bold text-on-surface font-mono">
             ฿{cashDrawerAmount.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-space-sm shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={onRefreshTax}
-          className="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container-lowest hover:bg-surface-container-high rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-colors"
+          className="flex items-center gap-1 px-2.5 py-1 bg-surface-container-lowest hover:bg-surface-container rounded-full border border-surface-container-high text-on-surface text-[11px] font-medium transition-colors"
           type="button"
-          title="ซิงค์ข้อมูลสรรพากรและบัญชี"
+          title="ซิงค์ข้อมูลภาษี"
         >
-          <span className="material-symbols-outlined text-[14px] text-primary">sync</span>
-          <span className="font-label-sm text-label-sm text-on-surface">ดึงข้อมูลภาษี</span>
+          <RefreshCw className="w-3 h-3 text-primary" />
+          <span>ดึงข้อมูลภาษี</span>
         </button>
         <button
-          onClick={() => alert('สรุปยอดปิดกะรอบเช้าเรียบร้อย ระบบพร้อมพิมพ์รายงานสรุปกะ')}
-          className="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container-lowest hover:bg-surface-container-high rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-colors"
+          onClick={() => alert('สรุปยอดปิดกะรอบเช้าเรียบร้อย ระบบพร้อมพิมพ์รายงาน')}
+          className="flex items-center gap-1 px-2.5 py-1 bg-surface-container-lowest hover:bg-surface-container rounded-full border border-surface-container-high text-on-surface text-[11px] font-medium transition-colors"
           type="button"
         >
-          <span className="material-symbols-outlined text-[14px] text-on-surface-variant">lock_clock</span>
-          <span className="font-label-sm text-label-sm text-on-surface">สรุปปิดกะ</span>
+          <Lock className="w-3 h-3 text-on-surface-variant" />
+          <span>สรุปปิดกะ</span>
         </button>
       </div>
     </div>
