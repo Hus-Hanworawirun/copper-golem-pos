@@ -7,12 +7,13 @@ import {
   Minus,
   Trash2,
   Printer,
-  QrCode,
-  Banknote,
+  Receipt,
+  Calculator,
   CheckCircle2,
   Lock,
   Search,
-  ShoppingBag
+  ShoppingBag,
+  Coins
 } from 'lucide-react';
 
 export default function CashierTab({
@@ -27,8 +28,6 @@ export default function CashierTab({
   selectedCategory,
   setSelectedCategory,
   categories,
-  paymentMethod,
-  setPaymentMethod,
   cashReceived,
   setCashReceived,
   onCheckout,
@@ -48,9 +47,7 @@ export default function CashierTab({
   const preVatAmount = Number((totalAmount - vatAmount).toFixed(2));
 
   // Change Calculation
-  const receivedNum = paymentMethod === 'CASH'
-    ? (parseFloat(cashReceived) || (cashReceived === '' ? 0 : 0))
-    : totalAmount;
+  const receivedNum = parseFloat(cashReceived) || 0;
   const changeDue = receivedNum >= totalAmount ? Number((receivedNum - totalAmount).toFixed(2)) : 0;
 
   // Filtered Products
@@ -372,98 +369,82 @@ export default function CashierTab({
           )}
         </div>
 
-        {/* Payment Console Box (Anchored at Bottom) */}
-        <div className="shrink-0 bg-[#202030] rounded-xl p-2.5 shadow-lg border border-white/10 flex flex-col gap-2 relative z-10">
-          {/* Payment Method Switcher */}
-          <div className="grid grid-cols-2 p-0.5 bg-[#12121b] rounded-full gap-1 border border-white/10">
-            <button
-              onClick={() => setPaymentMethod('CASH')}
-              type="button"
-              className={`flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${
-                paymentMethod === 'CASH'
-                  ? 'bg-primary-container text-white shadow-xs'
-                  : 'text-inverse-on-surface/70 hover:text-white'
-              }`}
-            >
-              <Banknote className="w-3.5 h-3.5" />
-              <span>เงินสด Cash</span>
-            </button>
-
-            <button
-              onClick={() => setPaymentMethod('TRANSFER_QR')}
-              type="button"
-              className={`flex items-center justify-center gap-1 py-1 rounded-full text-xs font-semibold transition-all ${
-                paymentMethod === 'TRANSFER_QR'
-                  ? 'bg-primary-container text-white shadow-xs'
-                  : 'text-inverse-on-surface/70 hover:text-white'
-              }`}
-            >
-              <QrCode className="w-3.5 h-3.5" />
-              <span>สแกน QR PromptPay</span>
-            </button>
+        {/* Price Calculation & Accounting Summary Box (Anchored at Bottom) */}
+        <div className="shrink-0 bg-[#202030] rounded-xl p-3 shadow-lg border border-white/10 flex flex-col gap-2.5 relative z-10">
+          {/* Header & Accounting Info */}
+          <div className="flex items-center justify-between text-xs pb-1 border-b border-white/10">
+            <span className="font-bold text-white flex items-center gap-1.5">
+              <Calculator className="w-3.5 h-3.5 text-primary-fixed" />
+              <span>คำนวณราคาสินค้า &amp; บัญชีต้นทุน</span>
+            </span>
+            <span className="text-[10px] text-inverse-on-surface/60 font-mono">
+              {totalItems} ชิ้นในตะกร้า
+            </span>
           </div>
 
-          {/* Tax Breakdown */}
-          <div className="flex flex-col gap-0.5 p-2 bg-white/5 rounded-lg text-[11px] border border-white/5 font-sans">
+          {/* Cost & Tax Breakdown */}
+          <div className="flex flex-col gap-1 p-2 bg-white/5 rounded-lg text-[11px] border border-white/5 font-sans">
             <div className="flex justify-between text-inverse-on-surface/70">
-              <span>ยอดก่อนภาษี (Pre-VAT):</span>
+              <span>ยอดรวมก่อนภาษี (Pre-VAT):</span>
               <span className="font-mono text-white">฿{preVatAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-inverse-on-surface/70">
-              <span>ภาษีมูลค่าเพิ่ม VAT 7% (ภ.พ.30):</span>
+              <span>ภาษีขาย VAT 7% (ภ.พ.30):</span>
               <span className="font-mono text-white">฿{vatAmount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-primary-fixed font-bold pt-0.5 border-t border-white/5">
-              <span>กำไรขั้นต้น (Order GP):</span>
+            <div className="flex justify-between text-inverse-on-surface/70">
+              <span>ต้นทุนสินค้ารวม (FIFO Cost):</span>
+              <span className="font-mono text-white/90">฿{totalCogs.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-primary-fixed font-bold pt-1 border-t border-white/10">
+              <span>กำไรขั้นต้นบัญชี (Order GP):</span>
               <span className="font-mono">+฿{grossProfit.toFixed(2)} ({gpPercent}%)</span>
             </div>
           </div>
 
           {/* Net Total Banner */}
-          <div className="flex items-center justify-between px-1">
+          <div className="flex items-center justify-between px-1 py-0.5">
             <span className="text-xs font-bold text-inverse-on-surface">
-              รวมสุทธิ (Net Payable)
+              ยอดรวมสุทธิ (Net Total)
             </span>
             <span className="text-2xl font-extrabold text-white tracking-tight font-mono">
               ฿{totalAmount.toFixed(2)}
             </span>
           </div>
 
-          {/* Cash Tender & Change (Only for Cash) */}
-          {paymentMethod === 'CASH' && (
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-inverse-on-surface/70 shrink-0">รับเงินมา:</span>
-                <input
-                  type="number"
-                  value={cashReceived}
-                  onChange={(e) => setCashReceived(e.target.value)}
-                  placeholder={totalAmount.toFixed(2)}
-                  className="w-full px-2.5 py-1 bg-[#12121b] border border-white/20 rounded-md text-white font-mono text-xs font-bold focus:outline-none focus:border-primary-container"
-                />
-              </div>
-
-              <div className="grid grid-cols-4 gap-1">
-                {getQuickTenderOptions().map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => setCashReceived(opt.toString())}
-                    className="py-1 rounded bg-white/5 hover:bg-white/15 text-white text-[10px] font-semibold transition-all active:scale-95 border border-white/5 font-mono"
-                  >
-                    {opt === totalAmount ? `พอดี ฿${opt.toFixed(0)}` : `฿${opt.toLocaleString('th-TH')}`}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between px-2.5 py-1 bg-[#12121b] rounded-md border border-white/10 text-xs">
-                <span className="text-[11px] text-inverse-on-surface/70">เงินทอน (Change Due):</span>
-                <span className="font-bold text-primary-fixed font-mono text-sm">
-                  ฿{changeDue.toFixed(2)}
-                </span>
-              </div>
+          {/* Change Due Calculator */}
+          <div className="flex flex-col gap-1.5 pt-1 border-t border-white/10">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-inverse-on-surface/70 shrink-0">รับเงินมา:</span>
+              <input
+                type="number"
+                value={cashReceived}
+                onChange={(e) => setCashReceived(e.target.value)}
+                placeholder={totalAmount > 0 ? totalAmount.toFixed(2) : "0.00"}
+                className="w-full px-2.5 py-1 bg-[#12121b] border border-white/20 rounded-md text-white font-mono text-xs font-bold focus:outline-none focus:border-primary-container"
+              />
             </div>
-          )}
+
+            <div className="grid grid-cols-4 gap-1">
+              {getQuickTenderOptions().map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setCashReceived(opt.toString())}
+                  className="py-1 rounded bg-white/5 hover:bg-white/15 text-white text-[10px] font-semibold transition-all active:scale-95 border border-white/5 font-mono"
+                >
+                  {opt === totalAmount ? `พอดี ฿${opt.toFixed(0)}` : `฿${opt.toLocaleString('th-TH')}`}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between px-2.5 py-1 bg-[#12121b] rounded-md border border-white/10 text-xs">
+              <span className="text-[11px] text-inverse-on-surface/70">เงินทอน (Change Due):</span>
+              <span className="font-bold text-primary-fixed font-mono text-sm">
+                ฿{changeDue.toFixed(2)}
+              </span>
+            </div>
+          </div>
 
           {/* F10 Finalize Button */}
           <button
@@ -472,22 +453,22 @@ export default function CashierTab({
             type="button"
             className="w-full py-2.5 rounded-full bg-primary-container hover:bg-primary disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 mt-0.5"
           >
-            <Printer className="w-4 h-4" />
-            <span>ชำระเงิน &amp; พิมพ์ใบเสร็จ</span>
+            <Receipt className="w-4 h-4" />
+            <span>คิดเงิน &amp; บันทึกบัญชี</span>
             <kbd className="px-1.5 py-0.5 bg-white/20 text-white rounded text-[10px] font-mono">
               F10
             </kbd>
           </button>
 
-          {/* Security Badges */}
+          {/* Security & Ledger Badges */}
           <div className="flex items-center justify-between text-[10px] text-inverse-on-surface/50 pt-0.5 px-1">
             <div className="flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3 text-primary-fixed" />
-              <span>ABB อัตโนมัติ</span>
+              <span>ลงบัญชีรายได้ทันที</span>
             </div>
             <div className="flex items-center gap-1">
               <Lock className="w-3 h-3" />
-              <span>ตัดสต็อก FIFO ทันที</span>
+              <span>ตัดสต็อก FIFO อัตโนมัติ</span>
             </div>
           </div>
         </div>

@@ -145,7 +145,7 @@ export default function Sidebar({
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-xs font-bold text-white truncate">สมชาย แคชเชียร์</span>
-            <span className="text-[10px] text-inverse-on-surface/60 truncate">สาขา 01 (พารากอน) • แคชเชียร์</span>
+            <span className="text-[10px] text-inverse-on-surface/60 truncate">ผู้ใช้งานระบบ • แคชเชียร์</span>
           </div>
         </div>
       </div>

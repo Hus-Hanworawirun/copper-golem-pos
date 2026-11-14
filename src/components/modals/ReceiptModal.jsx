@@ -45,7 +45,7 @@ export default function ReceiptModal({
               />
             </div>
             <h3 className="font-bold text-xs text-on-surface font-sans">COPPER GOLEM POS &amp; RETAIL</h3>
-            <p className="text-[10px] text-on-surface-variant font-sans">สาขา 01 สยามพารากอน ชั้น G กทม.</p>
+            <p className="text-[10px] text-on-surface-variant font-sans">ระบบขายปลีกและบันทึกบัญชีสินค้า</p>
             <p className="text-[10px] text-on-surface-variant font-sans">เลขประจำตัวผู้เสียภาษี: 0105566012345</p>
             <p className="text-[10px] text-primary font-sans font-bold pt-0.5">ใบกำกับภาษีอย่างย่อ (ABB)</p>
             <p className="text-[10px] text-outline font-mono">เลขที่: {order.order_no}</p>
@@ -85,17 +85,17 @@ export default function ReceiptModal({
             </div>
 
             <div className="flex justify-between text-on-surface-variant text-[11px] pt-0.5">
-              <span>วิธีชำระเงิน</span>
-              <span className="font-semibold text-on-surface">
-                {order.payment_method === 'CASH' ? 'เงินสด (Cash)' : 'PromptPay QR'}
+              <span>สถานะรายการ</span>
+              <span className="font-semibold text-primary">
+                บันทึกบัญชีสำเร็จ
               </span>
             </div>
 
-            {order.payment_method === 'CASH' && (
+            {order.change_amount > 0 && (
               <>
                 <div className="flex justify-between text-on-surface-variant text-[11px]">
                   <span>รับเงินมา</span>
-                  <span className="font-mono">฿{(order.cash_received || order.total_amount || 0).toFixed(2)}</span>
+                  <span className="font-mono">฿{(order.cash_received || 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-primary text-[11px]">
                   <span>เงินทอน</span>

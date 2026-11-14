@@ -4,7 +4,7 @@ import {
   FileDown,
   Printer,
   Database,
-  QrCode,
+  TrendingUp,
   Banknote,
   Search,
   ChevronRight,
@@ -53,8 +53,8 @@ export default function ReceiptsTab({
   const totalBills = filteredOrders.length;
   const totalGross = filteredOrders.reduce((sum, ord) => sum + (ord.total_amount || 0), 0);
   const avgBill = totalBills > 0 ? (totalGross / totalBills).toFixed(2) : '0.00';
-  const qrBillsCount = filteredOrders.filter(o => o.payment_method === 'TRANSFER_QR').length;
-  const qrRatio = totalBills > 0 ? ((qrBillsCount / totalBills) * 100).toFixed(0) : '0';
+  const totalProfit = filteredOrders.reduce((sum, ord) => sum + (ord.total_profit || 0), 0);
+  const avgProfitMargin = totalGross > 0 ? ((totalProfit / totalGross) * 100).toFixed(1) : '0';
 
   // Export CSV
   const handleExportCsv = () => {
@@ -174,17 +174,17 @@ export default function ReceiptsTab({
         <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-on-surface-variant uppercase font-medium">สัดส่วน QR vs เงินสด</span>
+              <span className="text-xs text-on-surface-variant uppercase font-medium">กำไรขั้นต้นรวม (Gross Profit)</span>
               <div className="text-xl font-bold text-on-surface mt-1 font-mono">
-                {qrRatio}% <span className="text-sm font-normal text-on-surface-variant">QR</span>
+                ฿{totalProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
             <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-              <QrCode className="w-4 h-4" />
+              <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-[11px] text-on-surface-variant">
-            QR: {qrBillsCount} | เงินสด: {totalBills - qrBillsCount}
+          <div className="mt-2 text-[11px] text-emerald-600 font-semibold font-mono">
+            อัตรากำไรเฉลี่ย {avgProfitMargin}% GP
           </div>
         </div>
 
@@ -299,12 +299,10 @@ export default function ReceiptsTab({
                         className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                           isSelected
                             ? 'bg-white/20 text-white'
-                            : ord.payment_method === 'CASH'
-                            ? 'bg-amber-400/20 text-amber-300'
-                            : 'bg-primary-container/30 text-primary-fixed'
+                            : 'bg-emerald-400/20 text-emerald-300'
                         }`}
                       >
-                        {ord.payment_method === 'CASH' ? 'เงินสด' : 'PromptPay'}
+                        บันทึกบัญชีแล้ว
                       </span>
 
                       <div className="text-right">
@@ -350,7 +348,7 @@ export default function ReceiptsTab({
                     COPPER GOLEM POS &amp; RETAIL
                   </div>
                   <div className="text-[10px] text-on-surface-variant font-sans">
-                    สาขา 01 สยามพารากอน ชั้น G กทม.
+                    ระบบขายปลีกและบันทึกบัญชีสินค้า
                   </div>
                   <div className="text-[10px] text-on-surface-variant font-sans">
                     เลขประจำตัวผู้เสียภาษี: 0105566012345

@@ -20,7 +20,6 @@ export default function App() {
 
   // POS State
   const [cart, setCart] = useState([]);
-  const [paymentMethod, setPaymentMethod] = useState('CASH'); // 'CASH', 'TRANSFER_QR'
   const [cashReceived, setCashReceived] = useState('');
   const [completedOrder, setCompletedOrder] = useState(null);
 
@@ -295,15 +294,13 @@ export default function App() {
 
   const cartTotalAmount = cart.reduce((sum, item) => sum + item.subtotal, 0);
 
-  // Checkout Handler
+  // Checkout Handler (Price Calculation & Accounting Recording)
   const handleCheckoutSubmit = async () => {
     if (cart.length === 0) return;
 
-    const received = paymentMethod === 'CASH'
-      ? parseFloat(cashReceived) || cartTotalAmount
-      : cartTotalAmount;
+    const received = cashReceived ? parseFloat(cashReceived) : cartTotalAmount;
 
-    if (paymentMethod === 'CASH' && received < cartTotalAmount) {
+    if (cashReceived && received < cartTotalAmount) {
       alert('จำนวนเงินที่รับมาไม่พอชำระ');
       return;
     }
@@ -314,7 +311,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: cart,
-          payment_method: paymentMethod,
+          payment_method: 'CASH',
           cash_received: received
         })
       });
@@ -603,8 +600,6 @@ export default function App() {
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             categories={categories}
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
             cashReceived={cashReceived}
             setCashReceived={setCashReceived}
             onCheckout={handleCheckoutSubmit}
