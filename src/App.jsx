@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import SubHeader from './components/SubHeader';
 import Footer from './components/Footer';
 import CashierTab from './components/CashierTab';
@@ -578,24 +578,25 @@ export default function App() {
   const currentRevenue = taxSummary?.total_revenue || 0;
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden bg-background text-on-surface antialiased font-['Plus_Jakarta_Sans','Prompt',sans-serif]">
-      {/* 1. TOP HEADER (Fixed height, shrink-0) */}
-      <Header
+    <div className="h-screen w-screen flex overflow-hidden bg-background text-on-surface antialiased font-['Plus_Jakarta_Sans','Prompt',sans-serif]">
+      {/* 1. LEFT SIDEBAR NAVIGATION */}
+      <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLoadSeed={handleLoadSeedData}
         onClearData={handleClearAllData}
-        productsCount={products.length}
       />
 
-      {/* 2. SUBHEADER BAR (Fixed height, shrink-0) */}
-      <SubHeader
-        onRefreshTax={fetchTaxData}
-        cashDrawerAmount={5000 + (orderHistory.filter(o => o.payment_method === 'CASH').reduce((s, o) => s + (o.total_amount || 0), 0))}
-      />
+      {/* 2. RIGHT MAIN CONTENT COLUMN */}
+      <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden">
+        {/* SUBHEADER BAR (Fixed height, shrink-0) */}
+        <SubHeader
+          onRefreshTax={fetchTaxData}
+          cashDrawerAmount={5000 + (orderHistory.filter(o => o.payment_method === 'CASH').reduce((s, o) => s + (o.total_amount || 0), 0))}
+        />
 
-      {/* 3. MAIN WORKSPACE (Flex-1 min-h-0 overflow-y-auto) */}
-      <main className="flex-1 min-h-0 overflow-y-auto bg-background flex flex-col">
+        {/* MAIN WORKSPACE (Flex-1 min-h-0 overflow-y-auto) */}
+        <main className="flex-1 min-h-0 overflow-y-auto bg-background flex flex-col">
         {activeTab === 'pos' && (
           <CashierTab
             products={products}
@@ -665,6 +666,7 @@ export default function App() {
 
       {/* 4. BOTTOM TELEMETRY FOOTER (Fixed height, shrink-0) */}
       <Footer currentRevenue={currentRevenue} />
+    </div>
 
       {/* 5. MODALS */}
       <ProductModal
