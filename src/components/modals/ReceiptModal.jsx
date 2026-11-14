@@ -36,6 +36,14 @@ export default function ReceiptModal({
         <div className="p-5 space-y-3 font-mono text-xs text-slate-800">
           {/* Header */}
           <div className="text-center space-y-0.5">
+            <div className="w-8 h-8 rounded-full mx-auto flex items-center justify-center mb-1 overflow-hidden shadow-xs border border-slate-200 bg-white p-0.5">
+              <img
+                src="/logo.png"
+                alt="Pouch Logo"
+                className="w-full h-full object-cover rounded-full"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            </div>
             <h3 className="font-bold text-sm text-slate-900 font-sans tracking-wide">POUCH</h3>
             <p className="text-[10px] text-slate-500 font-sans">ระบบขายปลีกและบันทึกบัญชีสินค้า</p>
             <p className="text-[10px] text-slate-500 font-sans">เลขประจำตัวผู้เสียภาษี: 0105566012345</p>

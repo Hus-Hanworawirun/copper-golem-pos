@@ -58,6 +58,7 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 700,
     title: 'Pouch',
+    icon: path.join(__dirname, 'build', 'icon.ico'),
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,

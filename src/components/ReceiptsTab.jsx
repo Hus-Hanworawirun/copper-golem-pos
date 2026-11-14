@@ -329,6 +329,14 @@ export default function ReceiptsTab({
               <div className="bg-slate-50 text-slate-800 rounded-2xl p-5 border border-slate-200 flex flex-col font-mono text-xs shadow-inner">
                 {/* Header */}
                 <div className="text-center pb-3 border-b border-dashed border-slate-300">
+                  <div className="w-8 h-8 rounded-full mx-auto flex items-center justify-center mb-1 overflow-hidden shadow-xs border border-slate-200 bg-white p-0.5">
+                    <img
+                      src="/logo.png"
+                      alt="Pouch Logo"
+                      className="w-full h-full object-cover rounded-full"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                  </div>
                   <div className="font-bold text-base text-slate-900 font-sans tracking-wide">
                     POUCH
                   </div>

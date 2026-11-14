@@ -24,11 +24,20 @@ export default function Sidebar({
   return (
     <aside className="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 border-r border-slate-800 select-none">
       {/* Brand Header */}
-      <div className="p-5 border-b border-slate-800">
-        <h1 className="font-bold text-xl text-white tracking-wide truncate">
-          Pouch
-        </h1>
-        <p className="text-xs text-amber-400/80 truncate mt-0.5">ระบบแคชเชียร์ &amp; คลังสต็อก</p>
+      <div className="p-4 border-b border-slate-800 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 shadow-md border border-slate-700/60 bg-slate-800 p-0.5">
+          <img
+            src="/logo.png"
+            alt="Pouch Logo"
+            className="w-full h-full object-cover rounded-full"
+          />
+        </div>
+        <div className="min-w-0">
+          <h1 className="font-bold text-lg text-white tracking-wide truncate">
+            Pouch
+          </h1>
+          <p className="text-xs text-amber-400/80 truncate">ระบบแคชเชียร์ &amp; คลังสต็อก</p>
+        </div>
       </div>
 
       {/* Barcode listener indicator */}
