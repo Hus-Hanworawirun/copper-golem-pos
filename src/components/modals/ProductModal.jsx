@@ -112,43 +112,64 @@ export default function ProductModal({
               />
             </div>
 
-            {/* Smart Pricing Box */}
+            {/* Smart Pricing Box (Supports Multi-Pack Purchases) */}
             <div className="md:col-span-2 p-3.5 bg-surface-container-low rounded-2xl border border-surface-container-high space-y-2.5">
-              <span className="font-bold text-primary flex items-center gap-1.5 text-xs">
-                <Calculator className="w-4 h-4" />
-                <span>คำนวณต้นทุนต่อหน่วย &amp; ราคาขาย (Smart Pricing)</span>
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-primary flex items-center gap-1.5 text-xs">
+                  <Calculator className="w-4 h-4" />
+                  <span>คำนวณต้นทุนต่อหน่วย &amp; ราคาขาย (Smart Pricing)</span>
+                </span>
+                <span className="text-[10px] text-on-surface-variant font-medium">
+                  รองรับการซื้อหลายแพ็ค / ยกลัง
+                </span>
+              </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                 <div>
-                  <label className="text-[10px] text-on-surface-variant block mb-0.5">
-                    ราคายกแพ็ค (฿)
+                  <label className="text-[10px] text-on-surface-variant block mb-0.5 font-medium">
+                    จำนวนแพ็คที่ซื้อ
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="1"
+                    value={productForm.pack_count || '1'}
+                    onChange={(e) => onCostCalculation('pack_count', e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-on-surface-variant block mb-0.5 font-medium">
+                    ราคาต่อแพ็ค (฿)
                   </label>
                   <input
                     type="number"
                     min="0"
                     step="any"
+                    placeholder="เช่น 40"
                     value={productForm.pack_cost}
                     onChange={(e) => onCostCalculation('pack_cost', e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] text-on-surface-variant block mb-0.5">
-                    จำนวนต่อแพ็ค
+                  <label className="text-[10px] text-on-surface-variant block mb-0.5 font-medium">
+                    จำนวนชิ้นต่อแพ็ค
                   </label>
                   <input
                     type="number"
                     min="1"
+                    placeholder="เช่น 4"
                     value={productForm.pack_qty}
                     onChange={(e) => onCostCalculation('pack_qty', e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] text-on-surface-variant block mb-0.5">
+                  <label className="text-[10px] text-on-surface-variant block mb-0.5 font-medium">
                     ต้นทุน/หน่วย (฿) <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -156,25 +177,43 @@ export default function ProductModal({
                     required
                     min="0"
                     step="any"
+                    placeholder="10.00"
                     value={productForm.cost_price}
                     onChange={(e) => onCostCalculation('cost_price', e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold text-primary"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold text-xs text-primary"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] text-on-surface-variant block mb-0.5">
+                  <label className="text-[10px] text-on-surface-variant block mb-0.5 font-medium">
                     กำไร/ชิ้น (฿)
                   </label>
                   <input
                     type="number"
                     step="any"
+                    placeholder="เช่น 2.00"
                     value={productForm.profit_margin}
                     onChange={(e) => onCostCalculation('profit_margin', e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container-high font-mono font-bold text-xs"
                   />
                 </div>
               </div>
+
+              {/* Multi-Pack Purchase Summary */}
+              {parseFloat(productForm.pack_cost) > 0 && (
+                <div className="px-3 py-1.5 bg-surface-container rounded-xl border border-surface-container-high flex flex-wrap items-center justify-between text-[11px] text-on-surface-variant">
+                  <div className="flex items-center gap-1.5">
+                    <span>ซื้อ <b>{productForm.pack_count || 1}</b> แพ็ค × <b>{productForm.pack_qty || 1}</b> ชิ้น =</span>
+                    <span className="font-bold text-primary font-mono">
+                      {(parseInt(productForm.pack_count, 10) || 1) * (parseInt(productForm.pack_qty, 10) || 1)} ชิ้น
+                    </span>
+                    <span className="text-[10px] text-emerald-600">(ลงสต็อกเริ่มต้นให้อัตโนมัติ)</span>
+                  </div>
+                  <div className="font-mono text-on-surface font-semibold">
+                    ยอดซื้อรวม ฿{((parseFloat(productForm.pack_count) || 1) * (parseFloat(productForm.pack_cost) || 0)).toFixed(2)}
+                  </div>
+                </div>
+              )}
 
               {/* Recommended Selling Price */}
               <div className="pt-2 border-t border-surface-container flex items-center justify-between">

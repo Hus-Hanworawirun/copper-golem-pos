@@ -30,6 +30,7 @@ export default function App() {
     name: '',
     barcode: '',
     category: 'ทั่วไป',
+    pack_count: '1',
     pack_cost: '',
     pack_qty: '',
     cost_price: '',
@@ -333,23 +334,29 @@ export default function App() {
     }
   };
 
-  // Smart Cost & Pricing Calculation
+  // Smart Cost & Pricing Calculation (Supports Multi-Pack Purchases)
   const handleCostCalculation = (field, value) => {
     const updated = { ...productForm, [field]: value };
+    const packCount = Math.max(1, parseInt(field === 'pack_count' ? value : updated.pack_count, 10) || 1);
     const packCost = parseFloat(field === 'pack_cost' ? value : updated.pack_cost) || 0;
     const packQty = Math.max(1, parseInt(field === 'pack_qty' ? value : updated.pack_qty, 10) || 1);
     let unitCost = parseFloat(field === 'cost_price' ? value : updated.cost_price) || 0;
     let profit = parseFloat(field === 'profit_margin' ? value : updated.profit_margin) || 0;
     let sellPrice = parseFloat(field === 'sell_price' ? value : updated.sell_price) || 0;
 
-    if (field === 'pack_cost' || field === 'pack_qty') {
-      if (packCost > 0) {
+    if (field === 'pack_count' || field === 'pack_cost' || field === 'pack_qty') {
+      if (packCost > 0 && packQty > 0) {
         unitCost = Number((packCost / packQty).toFixed(2));
         updated.cost_price = unitCost.toString();
         if (profit >= 0) {
           sellPrice = Number((unitCost + profit).toFixed(2));
           updated.sell_price = sellPrice.toString();
         }
+      }
+      // Auto calculate initial stock quantity from total packs * items per pack
+      const totalUnits = packCount * packQty;
+      if (totalUnits > 0) {
+        updated.stock_qty = totalUnits.toString();
       }
     } else if (field === 'cost_price') {
       if (profit >= 0) {
@@ -380,12 +387,13 @@ export default function App() {
       name: '',
       barcode: `885${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`,
       category: 'ทั่วไป',
+      pack_count: '1',
       pack_cost: prefill.pack_cost || '',
       pack_qty: prefill.pack_qty || '1',
       cost_price: prefill.cost_price || '',
       profit_margin: prefill.profit_margin || '',
       sell_price: prefill.sell_price || '',
-      stock_qty: '10',
+      stock_qty: '1',
       min_stock: '5'
     });
     setImageFile(null);
@@ -399,6 +407,7 @@ export default function App() {
       name: prod.name,
       barcode: prod.barcode || '',
       category: prod.category || 'ทั่วไป',
+      pack_count: '1',
       pack_cost: '',
       pack_qty: '1',
       cost_price: prod.cost_price.toString(),
