@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
-import SubHeader from './components/SubHeader';
 import Footer from './components/Footer';
 import CashierTab from './components/CashierTab';
 import InventoryTab from './components/InventoryTab';
@@ -589,12 +588,6 @@ export default function App() {
 
       {/* 2. RIGHT MAIN CONTENT COLUMN */}
       <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden">
-        {/* SUBHEADER BAR (Fixed height, shrink-0) */}
-        <SubHeader
-          onRefreshTax={fetchTaxData}
-          cashDrawerAmount={5000 + (orderHistory.filter(o => o.payment_method === 'CASH').reduce((s, o) => s + (o.total_amount || 0), 0))}
-        />
-
         {/* MAIN WORKSPACE (Flex-1 min-h-0 overflow-y-auto) */}
         <main className="flex-1 min-h-0 overflow-y-auto bg-background flex flex-col">
         {activeTab === 'pos' && (
