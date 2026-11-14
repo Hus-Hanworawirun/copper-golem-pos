@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
-import Footer from './components/Footer';
 import CashierTab from './components/CashierTab';
 import InventoryTab from './components/InventoryTab';
 import AnalyticsTab from './components/AnalyticsTab';
@@ -252,27 +251,26 @@ export default function App() {
         {
           product_id: product.id,
           name: product.name,
-          barcode: product.barcode,
-          image_url: product.image_url,
           unit_price: product.sell_price,
-          unit_cost: product.cost_price,
-          stock_qty: product.stock_qty,
+          unit_cost: product.cost_price || 0,
           quantity: 1,
-          subtotal: product.sell_price
+          subtotal: Number(product.sell_price.toFixed(2)),
+          image_url: product.image_url
         }
       ];
     });
   };
 
   const updateCartQty = (productId, delta) => {
-    setCart(prev =>
-      prev
+    const prod = products.find(p => p.id === productId);
+    setCart(prev => {
+      return prev
         .map(item => {
           if (item.product_id === productId) {
             const newQty = item.quantity + delta;
             if (newQty <= 0) return null;
-            if (newQty > item.stock_qty) {
-              alert(`สินค้ามีในสต็อกเพียง ${item.stock_qty} ชิ้น`);
+            if (prod && newQty > prod.stock_qty) {
+              alert(`สต็อกมีเพียง ${prod.stock_qty} ชิ้น`);
               return item;
             }
             return {
@@ -283,117 +281,82 @@ export default function App() {
           }
           return item;
         })
-        .filter(Boolean)
-    );
+        .filter(Boolean);
+    });
   };
 
   const removeFromCart = (productId) => {
     setCart(prev => prev.filter(item => item.product_id !== productId));
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    setCashReceived('');
+  };
 
-  const cartTotalAmount = cart.reduce((sum, item) => sum + item.subtotal, 0);
-
-  // Checkout Handler (Price Calculation & Accounting Recording)
+  // Checkout Submission (Direct checkout & optional cash tender calculation)
   const handleCheckoutSubmit = async () => {
-    if (cart.length === 0) return;
-
-    const received = cashReceived ? parseFloat(cashReceived) : cartTotalAmount;
-
-    if (cashReceived && received < cartTotalAmount) {
-      alert('จำนวนเงินที่รับมาไม่พอชำระ');
+    if (cart.length === 0) {
+      alert('ตะกร้าว่างเปล่า กรุณาเพิ่มสินค้าก่อนคิดเงิน');
       return;
     }
+
+    const totalAmount = cart.reduce((sum, item) => sum + item.subtotal, 0);
+    const parsedCash = parseFloat(cashReceived);
+    const cashVal = !isNaN(parsedCash) && parsedCash >= totalAmount ? parsedCash : totalAmount;
+    const changeVal = cashVal - totalAmount;
+
+    const payload = {
+      items: cart.map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        unit_cost: item.unit_cost,
+        subtotal: item.subtotal
+      })),
+      total_amount: totalAmount,
+      payment_method: 'เงินสด',
+      cash_received: cashVal,
+      change_amount: changeVal
+    };
 
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart,
-          payment_method: 'CASH',
-          cash_received: received
-        })
+        body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to checkout');
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'การคิดเงินล้มเหลว');
       }
 
-      setCompletedOrder(data);
+      const orderData = await res.json();
+      setCompletedOrder(orderData);
       clearCart();
-      setCashReceived('');
-      playBeep();
       fetchProducts();
       fetchAccountingData();
       fetchTaxData();
     } catch (err) {
-      alert(`เกิดข้อผิดพลาด: ${err.message}`);
+      alert(`เกิดข้อผิดพลาดในการคิดเงิน: ${err.message}`);
     }
   };
 
-  // Smart Cost & Pricing Calculation (Supports Multi-Pack Purchases)
-  const handleCostCalculation = (field, value) => {
-    const updated = { ...productForm, [field]: value };
-    const packCount = Math.max(1, parseInt(field === 'pack_count' ? value : updated.pack_count, 10) || 1);
-    const packCost = parseFloat(field === 'pack_cost' ? value : updated.pack_cost) || 0;
-    const packQty = Math.max(1, parseInt(field === 'pack_qty' ? value : updated.pack_qty, 10) || 1);
-    let unitCost = parseFloat(field === 'cost_price' ? value : updated.cost_price) || 0;
-    let profit = parseFloat(field === 'profit_margin' ? value : updated.profit_margin) || 0;
-    let sellPrice = parseFloat(field === 'sell_price' ? value : updated.sell_price) || 0;
-
-    if (field === 'pack_count' || field === 'pack_cost' || field === 'pack_qty') {
-      if (packCost > 0 && packQty > 0) {
-        unitCost = Number((packCost / packQty).toFixed(2));
-        updated.cost_price = unitCost.toString();
-        if (profit >= 0) {
-          sellPrice = Number((unitCost + profit).toFixed(2));
-          updated.sell_price = sellPrice.toString();
-        }
-      }
-      // Auto calculate initial stock quantity from total packs * items per pack
-      const totalUnits = packCount * packQty;
-      if (totalUnits > 0) {
-        updated.stock_qty = totalUnits.toString();
-      }
-    } else if (field === 'cost_price') {
-      if (profit >= 0) {
-        sellPrice = Number((unitCost + profit).toFixed(2));
-        updated.sell_price = sellPrice.toString();
-      }
-    } else if (field === 'profit_margin') {
-      sellPrice = Number((unitCost + profit).toFixed(2));
-      updated.sell_price = sellPrice.toString();
-    } else if (field === 'sell_price') {
-      profit = Number((sellPrice - unitCost).toFixed(2));
-      updated.profit_margin = profit.toString();
-    }
-
-    setProductForm(updated);
-  };
-
-  // Auto Generate Barcode
-  const handleAutoGenerateBarcode = () => {
-    const randomCode = `885${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`;
-    setProductForm(prev => ({ ...prev, barcode: randomCode }));
-  };
-
-  // Open Modals
-  const openAddProductModal = (prefill = {}) => {
+  // Product Modal Controls
+  const openAddProductModal = () => {
     setEditingProduct(null);
     setProductForm({
       name: '',
-      barcode: `885${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`,
+      barcode: '',
       category: 'ทั่วไป',
       pack_count: '1',
-      pack_cost: prefill.pack_cost || '',
-      pack_qty: prefill.pack_qty || '1',
-      cost_price: prefill.cost_price || '',
-      profit_margin: prefill.profit_margin || '',
-      sell_price: prefill.sell_price || '',
-      stock_qty: '1',
+      pack_cost: '',
+      pack_qty: '',
+      cost_price: '',
+      profit_margin: '',
+      sell_price: '',
+      stock_qty: '',
       min_stock: '5'
     });
     setImageFile(null);
@@ -401,94 +364,151 @@ export default function App() {
     setIsProductModalOpen(true);
   };
 
-  const openEditProductModal = (prod) => {
-    setEditingProduct(prod);
+  const openEditProductModal = (product) => {
+    setEditingProduct(product);
     setProductForm({
-      name: prod.name,
-      barcode: prod.barcode || '',
-      category: prod.category || 'ทั่วไป',
+      name: product.name,
+      barcode: product.barcode || '',
+      category: product.category || 'ทั่วไป',
       pack_count: '1',
       pack_cost: '',
-      pack_qty: '1',
-      cost_price: prod.cost_price.toString(),
-      profit_margin: (prod.sell_price - prod.cost_price).toFixed(2),
-      sell_price: prod.sell_price.toString(),
-      stock_qty: prod.stock_qty.toString(),
-      min_stock: (prod.min_stock || 5).toString()
+      pack_qty: '',
+      cost_price: product.cost_price?.toString() || '',
+      profit_margin: ((product.sell_price || 0) - (product.cost_price || 0)).toFixed(2),
+      sell_price: product.sell_price?.toString() || '',
+      stock_qty: product.stock_qty?.toString() || '0',
+      min_stock: product.min_stock?.toString() || '5'
     });
     setImageFile(null);
-    setImagePreview(prod.image_url || '');
+    setImagePreview(product.image_url || '');
     setIsProductModalOpen(true);
   };
 
-  const openBarcodeModal = (product) => {
-    setBarcodeModalProduct(product);
-    setPrintCopies(product.stock_qty > 0 ? product.stock_qty : 30);
-    setIsBarcodeModalOpen(true);
+  // Smart Pricing Cost Calculation (Supports Multi-Pack)
+  const handleCostCalculation = (field, val) => {
+    const updated = { ...productForm, [field]: val };
+
+    const packCount = parseFloat(updated.pack_count) || 1;
+    const packCost = parseFloat(updated.pack_cost);
+    const packQty = parseFloat(updated.pack_qty);
+
+    if (field === 'pack_cost' || field === 'pack_qty' || field === 'pack_count') {
+      if (packCost > 0 && packQty > 0) {
+        const unitCost = Number((packCost / packQty).toFixed(2));
+        updated.cost_price = unitCost.toString();
+
+        if (packCount > 0 && (!updated.stock_qty || updated.stock_qty === '0')) {
+          updated.stock_qty = (packCount * packQty).toString();
+        }
+
+        if (updated.profit_margin !== '') {
+          const margin = parseFloat(updated.profit_margin) || 0;
+          updated.sell_price = (unitCost + margin).toFixed(2);
+        } else if (updated.sell_price !== '') {
+          const sell = parseFloat(updated.sell_price) || 0;
+          updated.profit_margin = (sell - unitCost).toFixed(2);
+        }
+      }
+    } else if (field === 'cost_price') {
+      const cost = parseFloat(val) || 0;
+      if (updated.profit_margin !== '') {
+        const margin = parseFloat(updated.profit_margin) || 0;
+        updated.sell_price = (cost + margin).toFixed(2);
+      } else if (updated.sell_price !== '') {
+        const sell = parseFloat(updated.sell_price) || 0;
+        updated.profit_margin = (sell - cost).toFixed(2);
+      }
+    } else if (field === 'profit_margin') {
+      const cost = parseFloat(updated.cost_price) || 0;
+      const margin = parseFloat(val) || 0;
+      updated.sell_price = (cost + margin).toFixed(2);
+    } else if (field === 'sell_price') {
+      const cost = parseFloat(updated.cost_price) || 0;
+      const sell = parseFloat(val) || 0;
+      updated.profit_margin = (sell - cost).toFixed(2);
+    }
+
+    setProductForm(updated);
   };
 
+  // Generate Unique Barcode
+  const handleAutoGenerateBarcode = () => {
+    const randomSuffix = Math.floor(10000000 + Math.random() * 90000000);
+    const newBarcode = `885${randomSuffix}`;
+    setProductForm(prev => ({ ...prev, barcode: newBarcode }));
+  };
+
+  // Save Product (Create or Update)
+  const handleSaveProduct = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('name', productForm.name);
+      formData.append('barcode', productForm.barcode || '');
+      formData.append('category', productForm.category || 'ทั่วไป');
+      formData.append('cost_price', productForm.cost_price || 0);
+      formData.append('sell_price', productForm.sell_price || 0);
+      formData.append('stock_qty', productForm.stock_qty || 0);
+      formData.append('min_stock', productForm.min_stock || 0);
+
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
+
+      let res;
+      if (editingProduct) {
+        res = await fetch(`/api/products/${editingProduct.id}`, {
+          method: 'PUT',
+          body: formData
+        });
+      } else {
+        res = await fetch('/api/products', {
+          method: 'POST',
+          body: formData
+        });
+      }
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'บันทึกสินค้าไม่สำเร็จ');
+      }
+
+      setIsProductModalOpen(false);
+      fetchProducts();
+      fetchAccountingData();
+    } catch (err) {
+      alert(`ข้อผิดพลาด: ${err.message}`);
+    }
+  };
+
+  // Delete Product
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm('คุณแน่ใจว่าต้องการลบสินค้านี้ออกจากระบบหรือไม่?')) return;
+    try {
+      const res = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchProducts();
+        fetchAccountingData();
+      } else {
+        alert('ไม่สามารถลบสินค้าได้');
+      }
+    } catch (err) {
+      alert('เกิดข้อผิดพลาดในการลบสินค้า');
+    }
+  };
+
+  // Restock Modal
   const openRestockModal = (product) => {
     setRestockProduct(product);
     setRestockForm({
       add_qty: '',
-      batch_cost: product.cost_price.toString(),
+      batch_cost: product.cost_price?.toString() || '',
       update_cost_price: true,
       note: 'เติมสต็อกสินค้า'
     });
     setIsRestockModalOpen(true);
   };
 
-  // Save Product (Add or Edit)
-  const handleSaveProduct = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('name', productForm.name);
-    formData.append('barcode', productForm.barcode);
-    formData.append('category', productForm.category);
-    formData.append('cost_price', productForm.cost_price);
-    formData.append('sell_price', productForm.sell_price);
-    formData.append('stock_qty', productForm.stock_qty);
-    formData.append('min_stock', productForm.min_stock);
-
-    if (imageFile) {
-      formData.append('image', imageFile);
-    }
-
-    try {
-      const url = editingProduct ? `/api/products/${editingProduct.id}` : '/api/products';
-      const method = editingProduct ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        body: formData
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to save product');
-      }
-
-      setIsProductModalOpen(false);
-      fetchProducts();
-    } catch (err) {
-      alert(`บันทึกสินค้าไม่สำเร็จ: ${err.message}`);
-    }
-  };
-
-  // Delete Product
-  const handleDeleteProduct = async (id, name) => {
-    if (!window.confirm(`คุณแน่ใจว่าต้องการลบสินค้า "${name}" หรือไม่?`)) return;
-    try {
-      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        fetchProducts();
-      }
-    } catch (err) {
-      alert('ลบสินค้าไม่สำเร็จ');
-    }
-  };
-
-  // Restock Submit
   const handleRestockSubmit = async (e) => {
     e.preventDefault();
     if (!restockProduct) return;
@@ -498,25 +518,28 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          quantity: parseInt(restockForm.add_qty, 10),
-          cost_price: restockForm.batch_cost ? parseFloat(restockForm.batch_cost) : undefined,
+          add_qty: parseInt(restockForm.add_qty, 10),
+          batch_cost: restockForm.batch_cost ? parseFloat(restockForm.batch_cost) : undefined,
           update_cost_price: restockForm.update_cost_price,
           note: restockForm.note
         })
       });
 
-      if (res.ok) {
-        setIsRestockModalOpen(false);
-        fetchProducts();
-        fetchAccountingData();
-        fetchTaxData();
-      } else {
-        const err = await res.json();
-        alert(`เกิดข้อผิดพลาด: ${err.error}`);
-      }
+      if (!res.ok) throw new Error('เติมสต็อกไม่สำเร็จ');
+
+      setIsRestockModalOpen(false);
+      fetchProducts();
+      fetchAccountingData();
     } catch (err) {
-      alert('ไม่สามารถเติมสต็อกได้');
+      alert(`ข้อผิดพลาด: ${err.message}`);
     }
+  };
+
+  // Barcode Modal
+  const openBarcodeModal = (product) => {
+    setBarcodeModalProduct(product);
+    setPrintCopies(product.stock_qty > 0 ? product.stock_qty : 30);
+    setIsBarcodeModalOpen(true);
   };
 
   // Expense Handlers
@@ -529,21 +552,23 @@ export default function App() {
       });
       if (res.ok) {
         fetchTaxData();
+        fetchAccountingData();
       }
     } catch (err) {
-      alert('บันทึกค่าใช้จ่ายไม่สำเร็จ');
+      alert('ไม่สามารถบันทึกค่าใช้จ่ายได้');
     }
   };
 
   const handleDeleteExpense = async (id) => {
-    if (!window.confirm('ต้องการลบรายการค่าใช้จ่ายนี้หรือไม่?')) return;
+    if (!window.confirm('คุณต้องการลบรายการค่าใช้จ่ายนี้หรือไม่?')) return;
     try {
       const res = await fetch(`/api/expenses/${id}`, { method: 'DELETE' });
       if (res.ok) {
         fetchTaxData();
+        fetchAccountingData();
       }
     } catch (err) {
-      alert('ลบรายการไม่สำเร็จ');
+      alert('ไม่สามารถลบค่าใช้จ่ายได้');
     }
   };
 
@@ -579,94 +604,91 @@ export default function App() {
   // Categories list
   const categories = ['all', ...Array.from(new Set(products.map(p => p.category || 'ทั่วไป')))];
 
-  // Current year revenue for footer gauge
-  const currentRevenue = taxSummary?.total_revenue || 0;
-
   return (
-    <div className="h-screen w-screen flex overflow-hidden bg-background text-on-surface antialiased font-['Plus_Jakarta_Sans','Prompt',sans-serif]">
+    <div className="h-screen w-screen flex overflow-hidden bg-slate-100 text-slate-800 antialiased font-['Prompt',sans-serif]">
       {/* 1. LEFT SIDEBAR NAVIGATION */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        taxSummary={taxSummary}
+        cartCount={cart.length}
+        orderHistoryCount={orderHistory.length}
         onLoadSeed={handleLoadSeedData}
         onClearData={handleClearAllData}
       />
 
       {/* 2. RIGHT MAIN CONTENT COLUMN */}
       <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden">
-        {/* MAIN WORKSPACE (Flex-1 min-h-0 overflow-y-auto) */}
-        <main className="flex-1 min-h-0 overflow-y-auto bg-background flex flex-col">
-        {activeTab === 'pos' && (
-          <CashierTab
-            products={products}
-            cart={cart}
-            addToCart={addToCart}
-            updateCartQty={updateCartQty}
-            removeFromCart={removeFromCart}
-            clearCart={clearCart}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            categories={categories}
-            cashReceived={cashReceived}
-            setCashReceived={setCashReceived}
-            onCheckout={handleCheckoutSubmit}
-            onOpenAddProduct={() => openAddProductModal()}
-          />
-        )}
+        {/* MAIN WORKSPACE */}
+        <main className="flex-1 min-h-0 overflow-y-auto bg-slate-100 flex flex-col">
+          {activeTab === 'pos' && (
+            <CashierTab
+              products={products}
+              cart={cart}
+              addToCart={addToCart}
+              updateCartQty={updateCartQty}
+              removeFromCart={removeFromCart}
+              clearCart={clearCart}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              categories={categories}
+              cashReceived={cashReceived}
+              setCashReceived={setCashReceived}
+              onCheckout={handleCheckoutSubmit}
+              onOpenAddProduct={() => openAddProductModal()}
+            />
+          )}
 
-        {activeTab === 'inventory' && (
-          <InventoryTab
-            products={products}
-            onOpenAddProduct={openAddProductModal}
-            onOpenEditProduct={openEditProductModal}
-            onDeleteProduct={handleDeleteProduct}
-            onOpenRestock={openRestockModal}
-            onOpenBarcode={openBarcodeModal}
-          />
-        )}
+          {activeTab === 'inventory' && (
+            <InventoryTab
+              products={products}
+              onOpenAddProduct={openAddProductModal}
+              onOpenEditProduct={openEditProductModal}
+              onDeleteProduct={handleDeleteProduct}
+              onOpenRestock={openRestockModal}
+              onOpenBarcode={openBarcodeModal}
+            />
+          )}
 
-        {activeTab === 'accounting' && (
-          <AnalyticsTab
-            orderHistory={orderHistory}
-            stockLogs={stockLogs}
-            products={products}
-            expenses={expenses}
-            reportTimeframe={reportTimeframe}
-            setReportTimeframe={setReportTimeframe}
-            onViewReceipt={(ord) => setSelectedReceiptOrder(ord)}
-          />
-        )}
+          {activeTab === 'accounting' && (
+            <AnalyticsTab
+              orderHistory={orderHistory}
+              stockLogs={stockLogs}
+              products={products}
+              expenses={expenses}
+              reportTimeframe={reportTimeframe}
+              setReportTimeframe={setReportTimeframe}
+              onViewReceipt={(ord) => setSelectedReceiptOrder(ord)}
+            />
+          )}
 
-        {activeTab === 'receipts' && (
-          <ReceiptsTab
-            orderHistory={orderHistory}
-            onPrintThermal={(ord) => setSelectedReceiptOrder(ord)}
-          />
-        )}
+          {activeTab === 'receipts' && (
+            <ReceiptsTab
+              orderHistory={orderHistory}
+              onPrintThermal={(ord) => setSelectedReceiptOrder(ord)}
+            />
+          )}
 
-        {activeTab === 'tax' && (
-          <TaxTab
-            taxSummary={taxSummary}
-            taxCashFlow={taxCashFlow}
-            taxYear={taxYear}
-            setTaxYear={setTaxYear}
-            taxPeriod={taxPeriod}
-            setTaxPeriod={setTaxPeriod}
-            expenses={expenses}
-            onSaveExpense={handleSaveExpense}
-            onDeleteExpense={handleDeleteExpense}
-            onExportCsv={handleExportTaxCsv}
-          />
-        )}
-      </main>
+          {activeTab === 'tax' && (
+            <TaxTab
+              taxSummary={taxSummary}
+              taxCashFlow={taxCashFlow}
+              taxYear={taxYear}
+              setTaxYear={setTaxYear}
+              taxPeriod={taxPeriod}
+              setTaxPeriod={setTaxPeriod}
+              expenses={expenses}
+              onSaveExpense={handleSaveExpense}
+              onDeleteExpense={handleDeleteExpense}
+              onExportCsv={handleExportTaxCsv}
+            />
+          )}
+        </main>
+      </div>
 
-      {/* 4. BOTTOM TELEMETRY FOOTER (Fixed height, shrink-0) */}
-      <Footer currentRevenue={currentRevenue} />
-    </div>
-
-      {/* 5. MODALS */}
+      {/* 3. MODALS */}
       <ProductModal
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}

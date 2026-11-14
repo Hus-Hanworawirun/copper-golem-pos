@@ -8,18 +8,17 @@ import {
   Boxes,
   AlertTriangle,
   Percent,
-  Calculator,
   Search,
-  Barcode,
+  Barcode as BarcodeIcon,
   PlusCircle,
   Edit,
   Trash2,
   Package,
-  Tag
+  X
 } from 'lucide-react';
 
 export default function InventoryTab({
-  products,
+  products = [],
   onOpenAddProduct,
   onOpenEditProduct,
   onDeleteProduct,
@@ -28,18 +27,6 @@ export default function InventoryTab({
 }) {
   const [search, setSearch] = useState('');
   const [selectedCat, setSelectedCat] = useState('all');
-
-  // Smart Pricing Engine State
-  const [calcPackCost, setCalcPackCost] = useState(1200);
-  const [calcUnits, setCalcUnits] = useState(30);
-  const [calcMargin, setCalcMargin] = useState(55);
-
-  // Unit Cost & Recommended Price calculation
-  const unitCost = calcUnits > 0 ? Number((calcPackCost / calcUnits).toFixed(2)) : 0;
-  const recommendedPrice = calcMargin < 100
-    ? Number((unitCost / (1 - (calcMargin / 100))).toFixed(2))
-    : Number((unitCost * 2).toFixed(2));
-  const netProfit = Number((recommendedPrice - unitCost).toFixed(2));
 
   // Bento Metrics
   const totalStockValue = products.reduce((sum, p) => sum + ((p.cost_price || 0) * (p.stock_qty || 0)), 0);
@@ -58,13 +45,12 @@ export default function InventoryTab({
   const categories = ['all', ...Array.from(new Set(products.map(p => p.category || 'ทั่วไป')))];
 
   // Filtered Products
-  const filtered = products.filter(p => {
+  const filteredProducts = products.filter((p) => {
+    const q = search.toLowerCase();
     const matchesSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.barcode && p.barcode.includes(search));
-    if (selectedCat === 'low_stock') {
-      return matchesSearch && p.stock_qty <= (p.min_stock || 5);
-    }
+      p.name?.toLowerCase().includes(q) ||
+      (p.barcode && p.barcode.includes(q)) ||
+      (p.category && p.category.toLowerCase().includes(q));
     const matchesCat = selectedCat === 'all' || p.category === selectedCat;
     return matchesSearch && matchesCat;
   });
@@ -76,7 +62,7 @@ export default function InventoryTab({
       return;
     }
     const headers = ['รหัสสินค้า', 'ชื่อสินค้า', 'หมวดหมู่', 'บาร์โค้ด', 'ต้นทุนต่อชิ้น', 'ราคาขาย', 'กำไรต่อชิ้น', 'สต็อกคงเหลือ', 'จุดสั่งซื้อซ้ำ'];
-    const rows = products.map(p => [
+    const rows = products.map((p) => [
       p.id,
       `"${p.name.replace(/"/g, '""')}"`,
       `"${p.category || 'ทั่วไป'}"`,
@@ -87,474 +73,294 @@ export default function InventoryTab({
       p.stock_qty,
       p.min_stock || 5
     ]);
+
     const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `คลังสินค้า_CopperGolem_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `รายงานคลังสินค้า_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   return (
-    <div className="w-full p-4 lg:p-6 space-y-4 max-w-7xl mx-auto">
-      {/* Page Header & Action Bar */}
-      <section className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-1.5 text-on-surface-variant text-xs mb-1">
-            <span className="hover:text-primary cursor-pointer transition-colors font-medium">COPPER GOLEM POS</span>
-            <span className="text-outline-variant">/</span>
-            <span>ระบบคลังสินค้า &amp; ต้นทุน</span>
-            <span className="text-outline-variant">/</span>
-            <span className="text-primary font-semibold">Inventory Engine</span>
-          </div>
-          <h1 className="text-xl lg:text-2xl font-bold text-on-surface tracking-tight flex items-center gap-2">
-            <span>คลังสินค้า &amp; เครื่องคิดเลขต้นทุนอัจฉริยะ</span>
-            <span className="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-primary text-xs font-semibold">
-              FIFO Live v2.4
-            </span>
-          </h1>
-          <p className="text-xs text-on-surface-variant mt-0.5">
-            จัดการสต็อกสินค้า คำนวณต้นทุนต่อหน่วยแบบเรียลไทม์ และพิมพ์สติกเกอร์บาร์โค้ด Code 128
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleExportCsv}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-lowest hover:bg-surface-container text-on-surface text-xs font-semibold shadow-xs border border-surface-container-high transition-all"
-            type="button"
-          >
-            <FileDown className="w-3.5 h-3.5 text-on-surface-variant" />
-            <span>ส่งออก (.CSV)</span>
-          </button>
-
-          <button
-            onClick={() => {
-              if (products.length > 0) onOpenBarcode(products[0]);
-              else alert('ไม่มีสินค้าในระบบ');
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-lowest hover:bg-surface-container text-on-surface text-xs font-semibold shadow-xs border border-surface-container-high transition-all"
-            type="button"
-          >
-            <Printer className="w-3.5 h-3.5 text-primary" />
-            <span>พิมพ์บาร์โค้ด</span>
-          </button>
-
-          <button
-            onClick={() => {
-              if (products.length > 0) onOpenRestock(products[0]);
-              else alert('ไม่มีสินค้าให้เติมสต็อก');
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all"
-            type="button"
-          >
-            <Archive className="w-3.5 h-3.5 text-primary" />
-            <span>รับเข้าสต็อกด่วน</span>
-          </button>
-
-          <button
-            onClick={() => onOpenAddProduct()}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary-container text-white text-xs font-bold shadow-md hover:bg-primary transition-all active:scale-95"
-            type="button"
-          >
-            <Plus className="w-4 h-4" />
-            <span>เพิ่มสินค้าใหม่ (F3)</span>
-          </button>
-        </div>
-      </section>
-
-      {/* 4 Bento Telemetry Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-        {/* Card 1: Stock Value */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">มูลค่าสินค้าในคลัง (FIFO)</span>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-              <Wallet className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-2">
-            <span className="text-xl font-bold text-on-surface tracking-tight font-mono">
-              ฿{totalStockValue.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
-          </div>
-          <div className="mt-2 flex items-center justify-between text-[11px] text-on-surface-variant">
-            <span>ฐานสินทรัพย์หมุนเวียน</span>
-            <span className="text-primary font-semibold">Real-time</span>
-          </div>
-        </div>
-
-        {/* Card 2: SKUs */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">จำนวนรายการสินค้า (SKU)</span>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-              <Boxes className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-2">
-            <span className="text-xl font-bold text-on-surface tracking-tight font-mono">
-              {totalSkus} <span className="text-sm font-normal text-on-surface-variant">รายการ</span>
-            </span>
-          </div>
-          <div className="mt-2 flex items-center justify-between text-[11px] text-on-surface-variant">
-            <span>{categories.length - 1} หมวดหมู่</span>
-            <span className="text-secondary font-semibold">Active Catalog</span>
-          </div>
-        </div>
-
-        {/* Card 3: Low Stock */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">สินค้าสต็อกต่ำ</span>
-            <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600">
-              <AlertTriangle className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-2">
-            <span className="text-xl font-bold text-rose-600 tracking-tight font-mono">
-              {lowStockCount} <span className="text-sm font-normal text-rose-400">รายการ</span>
-            </span>
-          </div>
-          <div className="mt-2 flex items-center justify-between text-[11px]">
-            <span className="text-on-surface-variant">ต้องสั่งซื้อเพิ่ม (ROP)</span>
-            {lowStockCount > 0 ? (
-              <button
-                onClick={() => setSelectedCat('low_stock')}
-                className="text-rose-600 font-bold hover:underline"
-              >
-                กรองรายการ
-              </button>
-            ) : (
-              <span className="text-primary font-semibold">ปกติ</span>
-            )}
-          </div>
-        </div>
-
-        {/* Card 4: Margin */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">อัตรากำไรเฉลี่ย (GP%)</span>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-              <Percent className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold text-on-surface tracking-tight font-mono">
-              {avgMargin}%
-            </span>
-            <span className="text-[11px] text-primary font-semibold">เป้า &gt; 50%</span>
-          </div>
-          <div className="mt-2 flex items-center gap-2">
-            <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
-              <div
-                className="bg-primary-container h-full rounded-full transition-all"
-                style={{ width: `${Math.min(100, Math.max(0, avgMargin))}%` }}
-              ></div>
-            </div>
-            <span className="text-[10px] text-on-surface-variant whitespace-nowrap">
-              {avgMargin >= 50 ? 'แข็งแกร่ง' : 'ควรปรับ'}
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* Smart Cost & Pricing Calculator */}
-      <section className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 gap-2 border-b border-surface-container">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
-              <Calculator className="w-4 h-4" />
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-on-surface">
-                เครื่องคำนวณต้นทุนต่อหน่วย &amp; กำไรสุทธิอัจฉริยะ (Smart Pricing Engine)
-              </h2>
-              <p className="text-[11px] text-on-surface-variant">
-                คำนวณราคาซื้อยกแพ็ค แปลงเป็นต้นทุนย่อย และตั้งเป้า GP% แนะนำราคาขาย
-              </p>
-            </div>
-          </div>
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-semibold self-start sm:self-auto">
-            FIFO + Overhead
+    <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 font-['Prompt',sans-serif]">
+      {/* Top Header & Search Bar */}
+      <div className="p-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0">
+        <div className="flex items-center gap-3">
+          <h2 className="text-base font-bold text-slate-800">จัดการคลังสินค้า &amp; สต็อก</h2>
+          <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">
+            {products.length} รายการ
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 mt-3 items-center">
-          <div className="lg:col-span-3 bg-surface-container-low rounded-xl p-3 border border-surface-container-high">
-            <label className="block text-[11px] font-semibold text-on-surface-variant mb-1">
-              1. ราคายกแพ็ค / ลัง (รวม VAT)
-            </label>
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold text-on-surface">฿</span>
-              <input
-                type="number"
-                min="0"
-                step="any"
-                value={calcPackCost}
-                onChange={(e) => setCalcPackCost(parseFloat(e.target.value) || 0)}
-                className="w-full text-sm font-bold font-mono text-on-surface bg-surface-container-lowest px-2.5 py-1 rounded-lg border border-surface-container-high focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-            </div>
-          </div>
-
-          <div className="lg:col-span-2 bg-surface-container-low rounded-xl p-3 border border-surface-container-high">
-            <label className="block text-[11px] font-semibold text-on-surface-variant mb-1">
-              2. จำนวนหน่วยต่อแพ็ค
-            </label>
-            <div className="flex items-center gap-1.5">
-              <input
-                type="number"
-                min="1"
-                value={calcUnits}
-                onChange={(e) => setCalcUnits(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                className="w-full text-sm font-bold font-mono text-on-surface bg-surface-container-lowest px-2.5 py-1 rounded-lg border border-surface-container-high focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-              <span className="text-xs text-on-surface-variant shrink-0">ชิ้น</span>
-            </div>
-          </div>
-
-          <div className="lg:col-span-2 bg-surface-container rounded-xl p-3 border border-surface-container-high">
-            <span className="text-[11px] font-semibold text-on-surface-variant block">
-              3. ต้นทุนต่อชิ้น (Unit Cost)
-            </span>
-            <div className="mt-1 flex items-baseline gap-1">
-              <span className="text-lg font-bold text-primary font-mono">
-                ฿{unitCost.toFixed(2)}
-              </span>
-              <span className="text-[10px] text-on-surface-variant">/ ชิ้น</span>
-            </div>
-          </div>
-
-          <div className="lg:col-span-2 bg-surface-container-low rounded-xl p-3 border border-surface-container-high">
-            <label className="block text-[11px] font-semibold text-on-surface-variant mb-1">
-              4. ตั้งเป้ากำไร (GP%)
-            </label>
-            <div className="flex items-center gap-1.5">
-              <input
-                type="number"
-                min="0"
-                max="99"
-                value={calcMargin}
-                onChange={(e) => setCalcMargin(parseFloat(e.target.value) || 0)}
-                className="w-full text-sm font-bold font-mono text-on-surface bg-surface-container-lowest px-2.5 py-1 rounded-lg border border-surface-container-high focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-              <span className="text-xs font-bold text-on-surface">%</span>
-            </div>
-          </div>
-
-          <div className="lg:col-span-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl p-3 shadow-md flex flex-col justify-between">
-            <div className="flex items-center justify-between text-[11px] text-white/80 font-semibold">
-              <span>ราคาขายปลีกแนะนำ</span>
-              <Tag className="w-3.5 h-3.5" />
-            </div>
-            <div className="my-1 flex items-baseline gap-2">
-              <span className="text-xl font-bold font-mono">
-                ฿{recommendedPrice.toFixed(2)}
-              </span>
-              <span className="text-[11px] text-white/90 font-mono">
-                +฿{netProfit.toFixed(2)} กำไร
-              </span>
-            </div>
-            <button
-              onClick={() => onOpenAddProduct({
-                cost_price: unitCost.toString(),
-                sell_price: recommendedPrice.toString(),
-                profit_margin: netProfit.toString(),
-                pack_cost: calcPackCost.toString(),
-                pack_qty: calcUnits.toString()
-              })}
-              type="button"
-              className="mt-1 px-3 py-1 rounded-full bg-white text-primary hover:bg-surface text-xs font-bold transition-all shadow-xs active:scale-95 flex items-center justify-center gap-1"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>นำราคานี้ไปสร้างสินค้า</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Midnight Slate Stock Table */}
-      <section className="bg-[#181824] text-inverse-on-surface rounded-2xl p-4 shadow-xl border border-white/10">
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-inverse-on-surface/50 absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-64">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
+              type="text"
+              placeholder="ค้นหาสินค้า / บาร์โค้ด..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="ค้นหาชื่อสินค้า, SKU, บาร์โค้ด..."
-              className="w-full bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white placeholder:text-inverse-on-surface/40 text-xs pl-9 pr-3 py-2 rounded-full outline-none focus:ring-1 focus:ring-primary border border-white/5"
+              className="w-full pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 placeholder:text-slate-400"
             />
-          </div>
-
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            {categories.map((cat) => {
-              const isActive = selectedCat === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCat(cat)}
-                  type="button"
-                  className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                    isActive
-                      ? 'bg-primary-container text-white shadow-xs'
-                      : 'bg-white/10 hover:bg-white/15 text-inverse-on-surface/80 hover:text-white'
-                  }`}
-                >
-                  {cat === 'all' ? 'ทั้งหมด' : cat}
-                </button>
-              );
-            })}
-
-            {lowStockCount > 0 && (
+            {search && (
               <button
-                onClick={() => setSelectedCat('low_stock')}
                 type="button"
-                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1 ${
-                  selectedCat === 'low_stock'
-                    ? 'bg-rose-600 text-white'
-                    : 'bg-rose-500/20 text-rose-300'
-                }`}
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span>
-                สต็อกต่ำ ({lowStockCount})
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
+
+          <button
+            onClick={handleExportCsv}
+            type="button"
+            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200"
+          >
+            <FileDown className="w-3.5 h-3.5 text-slate-500" />
+            <span>ส่งออก .CSV</span>
+          </button>
+
+          <button
+            onClick={onOpenAddProduct}
+            type="button"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ เพิ่มสินค้าใหม่ (คำนวณต้นทุน/กำไร)</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* 4 Bento Telemetry Cards */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          {/* Card 1: Stock Value */}
+          <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 font-medium">มูลค่าสินค้าในคลัง (FIFO)</span>
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <Wallet className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <span className="text-xl font-bold text-slate-900 tracking-tight font-mono">
+                ฿{totalStockValue.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </div>
+            <div className="mt-1 flex items-center justify-between text-[11px] text-slate-400">
+              <span>ประเมินตามราคาต้นทุนจริง</span>
+              <span className="font-semibold text-emerald-600 font-mono">100% Active</span>
+            </div>
+          </div>
+
+          {/* Card 2: Total SKUs */}
+          <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 font-medium">จำนวนสินค้าทั้งหมด</span>
+              <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700">
+                <Boxes className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <span className="text-xl font-bold text-slate-900 tracking-tight font-mono">
+                {totalSkus} <span className="text-xs font-normal text-slate-500">รายการ</span>
+              </span>
+            </div>
+            <div className="mt-1 text-[11px] text-slate-400">
+              <span>{categories.length - 1} หมวดหมู่ในระบบ</span>
+            </div>
+          </div>
+
+          {/* Card 3: Low Stock Alerts */}
+          <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 font-medium">สินค้าใกล้หมด (เตือนสต็อก)</span>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${lowStockCount > 0 ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-400'}`}>
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <span className={`text-xl font-bold tracking-tight font-mono ${lowStockCount > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
+                {lowStockCount} <span className="text-xs font-normal text-slate-500">รายการ</span>
+              </span>
+            </div>
+            <div className="mt-1 text-[11px] text-slate-400">
+              <span>{lowStockCount > 0 ? 'ควรสั่งซื้อเพิ่มเข้าร้าน' : 'ระดับสต็อกเพียงพอทุกรายการ'}</span>
+            </div>
+          </div>
+
+          {/* Card 4: Avg Margin */}
+          <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 font-medium">อัตรากำไรเฉลี่ย (GP)</span>
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <Percent className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <span className="text-xl font-bold text-emerald-600 tracking-tight font-mono">
+                {avgMargin}% <span className="text-xs font-normal text-slate-500">GP เฉลี่ย</span>
+              </span>
+            </div>
+            <div className="mt-1 text-[11px] text-slate-400">
+              <span>คำนวณจากราคาขายและต้นทุน</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Category Pills Filter */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCat(cat)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                selectedCat === cat
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              {cat === 'all' ? 'ทั้งหมด' : cat}
+            </button>
+          ))}
         </div>
 
-        {/* Table Content */}
-        <div className="w-full overflow-x-auto pt-2">
-          {filtered.length === 0 ? (
-            <div className="py-12 text-center text-inverse-on-surface/40">
-              <Package className="w-10 h-10 mx-auto mb-2 opacity-50" />
-              <p className="text-xs">ไม่พบรายการสินค้าที่ตรงกับเงื่อนไข</p>
-            </div>
-          ) : (
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="text-inverse-on-surface/60 border-b border-white/10 pb-2">
-                  <th className="py-2.5 px-3 font-semibold">สินค้า / บาร์โค้ด</th>
-                  <th className="py-2.5 px-3 font-semibold">หมวดหมู่</th>
-                  <th className="py-2.5 px-3 font-semibold text-right">ต้นทุน FIFO</th>
-                  <th className="py-2.5 px-3 font-semibold text-right">ราคาขาย</th>
-                  <th className="py-2.5 px-3 font-semibold text-center">กำไร (GP%)</th>
-                  <th className="py-2.5 px-3 font-semibold text-center">สต็อก</th>
-                  <th className="py-2.5 px-3 font-semibold text-right">การจัดการ</th>
+        {/* Product Inventory Table (Clean White Card) */}
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+          <table className="w-full text-left text-xs text-slate-600">
+            <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold uppercase tracking-wider text-[11px]">
+              <tr>
+                <th className="py-3 px-4">รูปภาพ</th>
+                <th className="py-3 px-4">บาร์โค้ด</th>
+                <th className="py-3 px-4">ชื่อสินค้า / หมวดหมู่</th>
+                <th className="py-3 px-4 text-right">ต้นทุน/หน่วย</th>
+                <th className="py-3 px-4 text-right">กำไร/หน่วย</th>
+                <th className="py-3 px-4 text-right">ราคาขายปลีก</th>
+                <th className="py-3 px-4 text-center">สต็อกคงเหลือ</th>
+                <th className="py-3 px-4 text-right">มูลค่าสต็อก (ทุน)</th>
+                <th className="py-3 px-4 text-center">บาร์โค้ด &amp; จัดการ</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="py-12 text-center text-slate-400">
+                    ไม่พบรายการสินค้าที่ค้นหา
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {filtered.map((prod) => {
-                  const cost = prod.cost_price || 0;
-                  const sell = prod.sell_price || 0;
-                  const profit = sell - cost;
-                  const gp = sell > 0 ? ((profit / sell) * 100).toFixed(1) : '0';
-                  const isLowStock = prod.stock_qty <= (prod.min_stock || 5);
-                  const isOutOfStock = prod.stock_qty <= 0;
+              ) : (
+                filteredProducts.map((p) => {
+                  const isOutOfStock = p.stock_qty <= 0;
+                  const isLowStock = p.stock_qty <= (p.min_stock || 5);
+                  const itemTotalCostValue = p.stock_qty * (p.cost_price || 0);
 
                   return (
-                    <tr key={prod.id} className="hover:bg-white/5 transition-colors">
-                      <td className="py-2.5 px-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 bg-white/10 flex items-center justify-center">
-                            {prod.image_url ? (
-                              <img src={prod.image_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <Package className="w-4 h-4 text-inverse-on-surface/40" />
-                            )}
-                          </div>
-                          <div className="flex flex-col min-w-0">
-                            <span className="font-bold text-white truncate text-xs">{prod.name}</span>
-                            <span className="text-[10px] text-inverse-on-surface/60 font-mono">
-                              #{prod.barcode || prod.id}
-                            </span>
-                          </div>
+                    <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-2.5 px-4">
+                        <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                          {p.image_url ? (
+                            <img src={p.image_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Package className="w-5 h-5 text-slate-300" />
+                          )}
                         </div>
                       </td>
-
-                      <td className="py-2.5 px-3">
-                        <span className="px-2 py-0.5 rounded-full bg-white/10 text-inverse-on-surface text-[11px]">
-                          {prod.category || 'ทั่วไป'}
+                      <td className="py-2.5 px-4 font-mono font-medium text-slate-700">
+                        {p.barcode || '-'}
+                      </td>
+                      <td className="py-2.5 px-4">
+                        <div className="font-semibold text-slate-900">{p.name}</div>
+                        <span className="inline-block mt-0.5 px-2 py-0.5 bg-slate-100 rounded text-[10px] text-slate-500 font-medium border border-slate-200/60">
+                          {p.category || 'ทั่วไป'}
                         </span>
                       </td>
-
-                      <td className="py-2.5 px-3 text-right font-mono text-white font-semibold">
-                        ฿{cost.toFixed(2)}
+                      <td className="py-2.5 px-4 text-right font-medium text-slate-700 font-mono">
+                        ฿{(p.cost_price || 0).toFixed(2)}
+                        {p.pack_cost > 0 && (
+                          <div className="text-[10px] text-slate-400 font-sans">
+                            (ลัง {p.pack_qty} ชิ้น / ฿{p.pack_cost})
+                          </div>
+                        )}
                       </td>
-
-                      <td className="py-2.5 px-3 text-right font-mono text-primary-fixed font-bold">
-                        ฿{sell.toFixed(2)}
+                      <td className="py-2.5 px-4 text-right font-medium text-emerald-600 font-mono">
+                        +฿{((p.sell_price || 0) - (p.cost_price || 0)).toFixed(2)}
                       </td>
-
-                      <td className="py-2.5 px-3 text-center">
-                        <span className="px-2 py-0.5 rounded-full bg-primary-container text-white text-[10px] font-bold font-mono">
-                          +฿{profit.toFixed(2)} ({gp}%)
+                      <td className="py-2.5 px-4 text-right font-bold text-slate-900 text-sm font-mono">
+                        ฿{(p.sell_price || 0).toFixed(2)}
+                      </td>
+                      <td className="py-2.5 px-4 text-center">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                            isOutOfStock
+                              ? 'bg-rose-100 text-rose-700'
+                              : isLowStock
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-emerald-100 text-emerald-700'
+                          }`}
+                        >
+                          {p.stock_qty} ชิ้น
                         </span>
                       </td>
-
-                      <td className="py-2.5 px-3 text-center">
+                      <td className="py-2.5 px-4 text-right font-medium text-slate-700 font-mono">
+                        ฿{itemTotalCostValue.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td className="py-2.5 px-4 text-center">
                         <div className="flex items-center justify-center gap-1.5">
-                          <span
-                            className={`w-2 h-2 rounded-full ${
-                              isOutOfStock
-                                ? 'bg-rose-500'
-                                : isLowStock
-                                ? 'bg-amber-400 animate-ping'
-                                : 'bg-emerald-400'
-                            }`}
-                          ></span>
-                          <span className="font-bold text-white font-mono">{prod.stock_qty}</span>
-                        </div>
-                      </td>
+                          <button
+                            onClick={() => onOpenBarcode(p)}
+                            type="button"
+                            title="ดาวน์โหลด / พิมพ์บาร์โค้ดติดสินค้า"
+                            className="px-2 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors border border-blue-200/60"
+                          >
+                            <BarcodeIcon className="w-3.5 h-3.5" />
+                            <span>บาร์โค้ด</span>
+                          </button>
 
-                      <td className="py-2.5 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
                           <button
-                            onClick={() => onOpenRestock(prod)}
-                            className="p-1.5 rounded-full hover:bg-white/15 text-white transition-colors"
-                            title="เติมสต็อก"
+                            onClick={() => onOpenRestock(p)}
                             type="button"
+                            title="เติมสต็อกสินค้า"
+                            className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors border border-emerald-200/60"
                           >
-                            <PlusCircle className="w-4 h-4" />
+                            <PlusCircle className="w-3.5 h-3.5" />
+                            <span>เติมของ</span>
                           </button>
+
                           <button
-                            onClick={() => onOpenBarcode(prod)}
-                            className="p-1.5 rounded-full hover:bg-white/15 text-white transition-colors"
-                            title="พิมพ์บาร์โค้ด"
+                            onClick={() => onOpenEditProduct(p)}
                             type="button"
+                            title="แก้ไขข้อมูลสินค้า"
+                            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
                           >
-                            <Barcode className="w-4 h-4" />
+                            <Edit className="w-3.5 h-3.5" />
                           </button>
+
                           <button
-                            onClick={() => onOpenEditProduct(prod)}
-                            className="p-1.5 rounded-full hover:bg-white/15 text-white transition-colors"
-                            title="แก้ไข"
+                            onClick={() => onDeleteProduct(p.id, p.name)}
                             type="button"
+                            title="ลบสินค้านี้"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-slate-200"
                           >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => onDeleteProduct(prod.id, prod.name)}
-                            className="p-1.5 rounded-full hover:bg-rose-500/20 text-inverse-on-surface/50 hover:text-rose-400 transition-colors"
-                            title="ลบ"
-                            type="button"
-                          >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>
                     </tr>
                   );
-                })}
-              </tbody>
-            </table>
-          )}
+                })
+              )}
+            </tbody>
+          </table>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

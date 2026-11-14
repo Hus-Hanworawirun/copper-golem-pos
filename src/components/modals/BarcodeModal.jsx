@@ -118,21 +118,21 @@ export default function BarcodeModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-      <div className="bg-surface rounded-3xl max-w-md w-full border border-surface-container-high shadow-2xl overflow-hidden flex flex-col text-xs">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 font-['Prompt',sans-serif]">
+      <div className="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col text-xs">
         {/* Header */}
-        <div className="p-4 border-b border-surface-container-high flex items-center justify-between bg-surface-container-low">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary-container text-white flex items-center justify-center">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Barcode className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-bold text-on-surface">
+            <h3 className="text-sm font-bold text-slate-900">
               พิมพ์สติกเกอร์บาร์โค้ด Code 128
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
             type="button"
           >
             <X className="w-4 h-4" />
@@ -140,24 +140,24 @@ export default function BarcodeModal({
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-3.5">
-          <div className="flex items-center gap-2.5 p-2.5 bg-surface-container-lowest rounded-xl border border-surface-container-high">
-            <div className="w-10 h-10 rounded-lg bg-surface-container overflow-hidden flex items-center justify-center shrink-0">
+        <div className="p-5 space-y-4">
+          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div className="w-10 h-10 rounded-lg bg-slate-200 overflow-hidden flex items-center justify-center shrink-0">
               {product.image_url ? (
                 <img src={product.image_url} alt="" className="w-full h-full object-cover" />
               ) : (
-                <Package className="w-4 h-4 text-outline" />
+                <Package className="w-5 h-5 text-slate-400" />
               )}
             </div>
             <div className="min-w-0">
-              <h4 className="font-bold text-xs text-on-surface truncate">{product.name}</h4>
-              <p className="text-[11px] text-on-surface-variant font-mono">รหัส: {product.barcode || product.id}</p>
+              <h4 className="font-bold text-xs text-slate-900 truncate">{product.name}</h4>
+              <p className="text-[11px] text-slate-500 font-mono">รหัส: {product.barcode || product.id}</p>
             </div>
           </div>
 
           {/* Barcode Sticker Preview */}
-          <div className="flex flex-col items-center justify-center p-3.5 bg-white border border-dashed border-outline-variant rounded-xl shadow-inner text-center">
-            <span className="text-xs font-bold text-slate-800 line-clamp-1 mb-1">
+          <div className="flex flex-col items-center justify-center p-4 bg-white border border-dashed border-slate-300 rounded-xl shadow-inner text-center">
+            <span className="text-xs font-bold text-slate-900 line-clamp-1 mb-1">
               {product.name}
             </span>
 
@@ -165,14 +165,14 @@ export default function BarcodeModal({
               <svg ref={barcodeSvgRef} id="barcode-svg" className="max-w-full"></svg>
             </div>
 
-            <span className="text-sm font-bold text-primary font-mono">
+            <span className="text-sm font-bold text-emerald-600 font-mono">
               ฿{product.sell_price.toFixed(2)}
             </span>
           </div>
 
           {/* Copies Selector */}
-          <div className="p-3 bg-surface-container-low rounded-xl border border-surface-container-high space-y-2">
-            <div className="flex items-center justify-between text-xs font-semibold text-on-surface">
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+            <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
               <span>จำนวนดวงที่ต้องการพิมพ์:</span>
               <div className="flex items-center gap-1.5">
                 <input
@@ -181,9 +181,9 @@ export default function BarcodeModal({
                   max="500"
                   value={printCopies}
                   onChange={(e) => setPrintCopies(e.target.value)}
-                  className="w-16 px-2 py-1 text-center font-bold bg-surface-container-lowest border border-surface-container-high rounded-lg text-xs font-mono"
+                  className="w-16 px-2 py-1 text-center font-bold bg-white border border-slate-200 rounded-lg text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                 />
-                <span className="text-on-surface-variant text-xs">ดวง</span>
+                <span className="text-slate-500 text-xs">ดวง</span>
               </div>
             </div>
 
@@ -193,10 +193,10 @@ export default function BarcodeModal({
                   key={num}
                   type="button"
                   onClick={() => setPrintCopies(num)}
-                  className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border transition-all ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all ${
                     printCopies === num
-                      ? 'bg-primary-container text-white border-primary-container'
-                      : 'bg-surface-container-lowest text-on-surface border-surface-container-high hover:bg-surface-container'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   {num === product.stock_qty ? `สต็อก (${num})` : `${num} ดวง`}
@@ -206,20 +206,20 @@ export default function BarcodeModal({
           </div>
 
           {/* Actions */}
-          <div className="grid grid-cols-2 gap-2 pt-1">
+          <div className="grid grid-cols-2 gap-2.5 pt-1">
             <button
               type="button"
               onClick={handleDownloadPng}
-              className="py-2 px-3 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full font-bold text-xs flex items-center justify-center gap-1.5 transition-colors border border-surface-container-high"
+              className="py-2.5 px-3 bg-white hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-colors border border-slate-200"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-slate-500" />
               <span>โหลดรูป PNG</span>
             </button>
 
             <button
               type="button"
               onClick={handlePrintLabels}
-              className="py-2 px-3 bg-primary-container hover:bg-primary text-white rounded-full font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95"
+              className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>พิมพ์สติกเกอร์</span>

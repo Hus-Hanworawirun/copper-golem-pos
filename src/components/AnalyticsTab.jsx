@@ -29,7 +29,6 @@ export default function AnalyticsTab({
 }) {
   const [activeSubTab, setActiveSubTab] = useState('orders'); // 'orders' or 'stock_logs'
   const [search, setSearch] = useState('');
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
 
   // Filter Orders by Timeframe
   const filteredOrders = useMemo(() => {
@@ -262,28 +261,6 @@ export default function AnalyticsTab({
       .slice(0, 5);
   }, [filteredOrders]);
 
-  // Category Breakdown
-  const categoryStats = useMemo(() => {
-    const map = {};
-    filteredOrders.forEach((ord) => {
-      ord.items?.forEach((it) => {
-        const prod = products.find((p) => p.id === it.product_id || p.name === it.product_name);
-        const cat = prod?.category || 'ทั่วไป';
-        if (!map[cat]) {
-          map[cat] = { category: cat, revenue: 0, cogs: 0, profit: 0, qty: 0 };
-        }
-        const cogs = (it.unit_cost || 0) * (it.quantity || 1);
-        map[cat].revenue += it.subtotal || 0;
-        map[cat].cogs += cogs;
-        map[cat].profit += (it.subtotal || 0) - cogs;
-        map[cat].qty += it.quantity || 1;
-      });
-    });
-
-    const list = Object.values(map).sort((a, b) => b.revenue - a.revenue);
-    return list;
-  }, [filteredOrders, products]);
-
   // Search in Orders
   const searchedOrders = useMemo(() => {
     return filteredOrders.filter((ord) => {
@@ -354,33 +331,26 @@ export default function AnalyticsTab({
   };
 
   return (
-    <div className="w-full p-4 lg:p-6 space-y-4 max-w-7xl mx-auto">
+    <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif]">
       {/* Header & Controls */}
-      <section className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-1.5 text-on-surface-variant text-xs mb-1">
-            <span className="hover:text-primary cursor-pointer transition-colors font-medium">COPPER GOLEM POS</span>
-            <span className="text-outline-variant">/</span>
-            <span>วิเคราะห์ผลประกอบการ</span>
-            <span className="text-outline-variant">/</span>
-            <span className="text-primary font-semibold">P&amp;L FIFO Real-time</span>
-          </div>
-          <h1 className="text-xl lg:text-2xl font-bold text-on-surface tracking-tight">
-            ภาพรวมกำไร-ขาดทุน &amp; บัญชีต้นทุน FIFO
+          <h1 className="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">
+            ภาพรวมกำไร-ขาดทุน & บัญชีต้นทุน FIFO
           </h1>
-          <p className="text-xs text-on-surface-variant mt-0.5">
-            ข้อมูลตามธุรกรรมจริงจากฐานข้อมูล SQLite ตัดต้นทุน FIFO แม่นยำทุกบิล
+          <p className="text-xs text-slate-500 mt-1">
+            วิเคราะห์ผลประกอบการ กำไรขั้นต้น และตัดสต็อกต้นทุน FIFO จากฐานข้อมูลจริง
           </p>
         </div>
 
         {/* Date Filter Pills & Export Trigger */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex p-1 bg-surface-container rounded-full border border-surface-container-high">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="inline-flex p-1 bg-slate-200/80 rounded-xl border border-slate-300/40">
             {[
-              { id: 'today', label: 'รายวัน' },
-              { id: 'week', label: 'สัปดาห์นี้' },
-              { id: 'month', label: 'รายเดือน' },
-              { id: 'all', label: 'ตลอดเวลา' }
+              { id: 'today', label: 'ยอดวันนี้' },
+              { id: 'week', label: '7 วันนี้' },
+              { id: 'month', label: 'เดือนนี้' },
+              { id: 'all', label: 'สะสมทั้งหมด' }
             ].map((pill) => {
               const isActive = reportTimeframe === pill.id;
               return (
@@ -388,10 +358,10 @@ export default function AnalyticsTab({
                   key={pill.id}
                   onClick={() => setReportTimeframe(pill.id)}
                   type="button"
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-primary text-white shadow-xs'
-                      : 'text-on-surface-variant hover:text-on-surface'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   {pill.label}
@@ -402,91 +372,91 @@ export default function AnalyticsTab({
 
           <button
             onClick={handleExportCsv}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest text-on-surface text-xs font-semibold rounded-full border border-surface-container-high shadow-xs hover:bg-surface-container transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
             type="button"
             title="ส่งออกไฟล์รายงานเป็น Excel/CSV"
           >
-            <FileDown className="w-3.5 h-3.5 text-primary" />
+            <FileDown className="w-4 h-4" />
             <span>ส่งออก .CSV</span>
           </button>
         </div>
       </section>
 
-      {/* Top 4 Real Bento KPI Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+      {/* Top 4 Bento KPI Metric Cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Gross Sales */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">ยอดขายรวม (Gross Sales)</span>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <span className="text-xs text-slate-500 font-medium">ยอดขายรวม (Gross Sales)</span>
+            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="my-2">
-            <div className="text-xl font-bold text-on-surface tracking-tight font-mono">
+            <div className="text-2xl font-bold text-slate-900 font-mono">
               ฿{grossSales.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="text-primary font-semibold font-mono">
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span className="text-emerald-600 font-medium">
               {reportTimeframe === 'today' ? 'วันนี้' : reportTimeframe === 'week' ? '7 วันที่ผ่านมา' : reportTimeframe === 'month' ? 'เดือนนี้' : 'ยอดสะสมทั้งหมด'}
             </span>
-            <span className="text-on-surface-variant font-mono">{orderCount} บิลขาย</span>
+            <span className="font-mono">{orderCount} บิลขาย</span>
           </div>
         </div>
 
         {/* Card 2: COGS FIFO */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">ต้นทุนขาย FIFO (COGS)</span>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+            <span className="text-xs text-slate-500 font-medium">ต้นทุนขาย FIFO (COGS)</span>
+            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
               <Boxes className="w-4 h-4" />
             </div>
           </div>
           <div className="my-2">
-            <div className="text-xl font-bold text-on-surface tracking-tight font-mono">
+            <div className="text-2xl font-bold text-slate-700 font-mono">
               ฿{totalCogs.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
-            <span>สัดส่วนต้นทุน {grossSales > 0 ? ((totalCogs / grossSales) * 100).toFixed(1) : 0}%</span>
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span>ต้นทุน {grossSales > 0 ? ((totalCogs / grossSales) * 100).toFixed(1) : 0}%</span>
             <span>เฉลี่ย ฿{avgTicket}/บิล</span>
           </div>
         </div>
 
         {/* Card 3: Gross Profit */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">กำไรขั้นต้น (Gross Profit)</span>
-            <div className="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+            <span className="text-xs text-slate-500 font-medium">กำไรขั้นต้น (Gross Profit)</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="my-2">
-            <div className="text-xl font-bold text-primary tracking-tight font-mono">
+            <div className="text-2xl font-bold text-emerald-600 font-mono">
               ฿{grossProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
-            <span className="text-primary font-bold">อัตรากำไร GP {gpMargin}%</span>
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span className="text-emerald-600 font-bold">อัตรากำไร GP {gpMargin}%</span>
             <span>หักต้นทุนสินค้าจริง</span>
           </div>
         </div>
 
         {/* Card 4: Net Operating Profit */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">กำไรสุทธิการดำเนินงาน (Net Profit)</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-600">
+            <span className="text-xs text-slate-500 font-medium">กำไรสุทธิ (Net Operating Profit)</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
               <Award className="w-4 h-4" />
             </div>
           </div>
           <div className="my-2">
-            <div className={`text-xl font-bold tracking-tight font-mono ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <div className={`text-2xl font-bold font-mono ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
               ฿{netProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
+          <div className="flex items-center justify-between text-xs text-slate-400">
             <span>หักค่าใช้จ่าย ฿{totalExpenses.toFixed(2)}</span>
             <span className="font-bold text-emerald-600 font-mono">Net {netMargin}%</span>
           </div>
@@ -494,38 +464,34 @@ export default function AnalyticsTab({
       </section>
 
       {/* Middle Section: Real Dynamic Interactive Chart & Top 5 Champions */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         {/* Left 8 Cols: Real Dynamic Chart */}
-        <div className="lg:col-span-8 bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
+        <div className="lg:col-span-8 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-on-surface">
-                  กราฟยอดขายและต้นทุนจริง (Dynamic P&amp;L)
+                <span className="text-sm font-bold text-slate-900">
+                  กราฟยอดขายและต้นทุนจริง (Dynamic P&L)
                 </span>
                 {peakSlot && (
-                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold border border-primary/20">
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200">
                     พีคสุด: {peakSlot.shortLabel} (฿{peakSlot.sales.toLocaleString('th-TH')})
                   </span>
                 )}
               </div>
-              <span className="text-[11px] text-on-surface-variant block mt-0.5">
+              <span className="text-xs text-slate-500 block mt-0.5">
                 คำนวณแบบ Real-time ตามช่วงเวลา {reportTimeframe === 'today' ? 'รายชั่วโมงวันนี้' : reportTimeframe === 'week' ? '7 วันย้อนหลัง' : reportTimeframe === 'month' ? 'สัปดาห์ในเดือนนี้' : 'รายเดือน'}
               </span>
             </div>
 
-            <div className="flex items-center gap-3 text-xs">
+            <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-primary"></span>
-                <span className="text-on-surface-variant text-[11px]">ยอดขาย</span>
+                <span className="w-3 h-3 rounded bg-emerald-600"></span>
+                <span className="text-slate-600 text-xs">ยอดขาย</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-slate-400"></span>
-                <span className="text-on-surface-variant text-[11px]">ต้นทุน FIFO</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span>
-                <span className="text-on-surface-variant text-[11px]">กำไรขั้นต้น</span>
+                <span className="w-3 h-3 rounded bg-slate-300"></span>
+                <span className="text-slate-600 text-xs">ต้นทุน FIFO</span>
               </div>
             </div>
           </div>
@@ -533,19 +499,19 @@ export default function AnalyticsTab({
           {/* Real Bar Visualization */}
           <div className="w-full pt-2">
             {grossSales === 0 ? (
-              <div className="h-44 w-full flex flex-col items-center justify-center text-center border border-dashed border-surface-container-high rounded-xl p-4">
-                <BarChart3 className="w-8 h-8 text-on-surface-variant/40 mb-1.5" />
-                <span className="text-xs font-semibold text-on-surface-variant">
+              <div className="h-48 w-full flex flex-col items-center justify-center text-center border border-dashed border-slate-200 rounded-xl p-4">
+                <BarChart3 className="w-8 h-8 text-slate-300 mb-2" />
+                <span className="text-xs font-semibold text-slate-600">
                   ยังไม่มีข้อมูลการขายจริงในช่วงเวลานี้
                 </span>
-                <span className="text-[11px] text-on-surface-variant/60 mt-0.5">
+                <span className="text-[11px] text-slate-400 mt-0.5">
                   เมื่อคิดเงินและบันทึกออเดอร์ กราฟจะพล็อตยอดขายและต้นทุนตามช่วงเวลาจริงอัตโนมัติ
                 </span>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {/* Visual Chart Bars */}
-                <div className="h-44 w-full flex items-end justify-between gap-2 px-1 pt-6 pb-1 border-b border-surface-container">
+                <div className="h-48 w-full flex items-end justify-between gap-2 px-1 pt-6 pb-2 border-b border-slate-100">
                   {chartData.map((slot, idx) => {
                     const salesHeightPct = maxChartVal > 0 ? Math.min(100, Math.max(4, (slot.sales / maxChartVal) * 100)) : 4;
                     const cogsHeightPct = maxChartVal > 0 ? Math.min(100, Math.max(2, (slot.cogs / maxChartVal) * 100)) : 2;
@@ -559,34 +525,34 @@ export default function AnalyticsTab({
                       >
                         {/* Peak indicator */}
                         {isPeak && (
-                          <div className="absolute -top-5 text-[9px] font-bold text-primary bg-primary-fixed px-1 rounded shadow-xs whitespace-nowrap animate-bounce">
+                          <div className="absolute -top-5 text-[9px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded shadow-xs whitespace-nowrap animate-bounce">
                             Peak
                           </div>
                         )}
 
                         {/* Dual Column Bars */}
-                        <div className="w-full max-w-[36px] flex items-end justify-center gap-1 h-full">
+                        <div className="w-full max-w-[36px] flex items-end justify-center gap-1.5 h-full">
                           {/* Sales Bar */}
                           <div
                             style={{ height: `${salesHeightPct}%` }}
                             className={`w-1/2 rounded-t-md transition-all duration-300 ${
-                              isPeak ? 'bg-primary' : 'bg-primary/80 group-hover:bg-primary'
+                              isPeak ? 'bg-emerald-600' : 'bg-emerald-600/80 group-hover:bg-emerald-600'
                             }`}
                           />
                           {/* COGS Bar */}
                           <div
                             style={{ height: `${cogsHeightPct}%` }}
-                            className="w-1/2 rounded-t-md bg-slate-400/80 group-hover:bg-slate-400 transition-all duration-300"
+                            className="w-1/2 rounded-t-md bg-slate-300 group-hover:bg-slate-400 transition-all duration-300"
                           />
                         </div>
 
                         {/* Hover Tooltip Card */}
-                        <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col p-2 bg-slate-900 text-white rounded-lg shadow-xl text-[10px] z-30 pointer-events-none min-w-[120px] whitespace-nowrap">
-                          <span className="font-bold text-white border-b border-white/10 pb-0.5 mb-1">{slot.label}</span>
-                          <span className="text-primary-fixed font-mono">ขาย: ฿{slot.sales.toFixed(2)}</span>
+                        <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col p-2.5 bg-slate-900 text-white rounded-xl shadow-xl text-xs z-30 pointer-events-none min-w-[130px] whitespace-nowrap">
+                          <span className="font-bold text-white border-b border-slate-700 pb-1 mb-1">{slot.label}</span>
+                          <span className="text-emerald-400 font-mono">ขาย: ฿{slot.sales.toFixed(2)}</span>
                           <span className="text-slate-300 font-mono">ทุน: ฿{slot.cogs.toFixed(2)}</span>
-                          <span className="text-emerald-400 font-mono font-bold">กำไร: +฿{slot.profit.toFixed(2)}</span>
-                          <span className="text-white/60 text-[9px] mt-0.5">{slot.orders} รายการ</span>
+                          <span className="text-emerald-300 font-mono font-bold">กำไร: +฿{slot.profit.toFixed(2)}</span>
+                          <span className="text-slate-400 text-[10px] mt-0.5">{slot.orders} รายการ</span>
                         </div>
                       </div>
                     );
@@ -594,12 +560,12 @@ export default function AnalyticsTab({
                 </div>
 
                 {/* X-Axis Timeline Labels */}
-                <div className="flex justify-between items-center text-on-surface-variant text-[11px] px-1 font-sans">
+                <div className="flex justify-between items-center text-slate-500 text-xs px-1">
                   {chartData.map((slot, idx) => (
                     <span
                       key={idx}
                       className={`text-center truncate flex-1 ${
-                        peakSlot && peakSlot.shortLabel === slot.shortLabel ? 'text-primary font-bold' : ''
+                        peakSlot && peakSlot.shortLabel === slot.shortLabel ? 'text-emerald-600 font-bold' : ''
                       }`}
                     >
                       {slot.shortLabel}
@@ -610,30 +576,30 @@ export default function AnalyticsTab({
             )}
           </div>
 
-          <div className="mt-3 pt-2 flex items-center justify-between text-xs text-on-surface-variant border-t border-surface-container">
-            <span className="flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          <div className="mt-4 pt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100">
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>คำนวณจากยอดออเดอร์ในระบบจริง</span>
             </span>
-            <span className="text-primary font-bold font-mono">
+            <span className="text-emerald-600 font-bold font-mono">
               อัตรากำไรขั้นต้นรวม {gpMargin}% GP
             </span>
           </div>
         </div>
 
         {/* Right 4 Cols: Top 5 Profit Champions */}
-        <div className="lg:col-span-4 bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-2">
+        <div className="lg:col-span-4 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
             <div>
-              <span className="text-sm font-bold text-on-surface">5 อันดับสินค้าทำกำไรสูงสุด</span>
-              <span className="text-[11px] text-on-surface-variant block">Top Gross Profit Contributors</span>
+              <span className="text-sm font-bold text-slate-900">5 อันดับสินค้าทำกำไรสูงสุด</span>
+              <span className="text-xs text-slate-500 block">Top Gross Profit Contributors</span>
             </div>
-            <Award className="w-4 h-4 text-primary" />
+            <Award className="w-5 h-5 text-amber-500" />
           </div>
 
-          <div className="space-y-2 my-auto">
+          <div className="space-y-2.5 my-auto">
             {topContributors.length === 0 ? (
-              <div className="py-8 text-center text-on-surface-variant text-xs">
+              <div className="py-12 text-center text-slate-400 text-xs">
                 ยังไม่มีข้อมูลการขายในรอบนี้
               </div>
             ) : (
@@ -644,30 +610,30 @@ export default function AnalyticsTab({
                 return (
                   <div
                     key={item.name}
-                    className="p-2.5 rounded-xl bg-surface-container-low border border-surface-container-high text-xs space-y-1.5"
+                    className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs space-y-1.5"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-5 h-5 rounded-md bg-primary-container text-white flex items-center justify-center font-bold text-[10px] shrink-0">
+                        <div className="w-5 h-5 rounded-md bg-slate-800 text-white flex items-center justify-center font-bold text-[10px] shrink-0">
                           {idx + 1}
                         </div>
-                        <span className="font-bold text-on-surface truncate">{item.name}</span>
+                        <span className="font-bold text-slate-800 truncate">{item.name}</span>
                       </div>
-                      <span className="font-bold text-primary font-mono shrink-0 pl-2">
+                      <span className="font-bold text-emerald-600 font-mono shrink-0 pl-2">
                         +฿{item.profit.toFixed(2)}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-on-surface-variant font-sans">
-                      <span>ขายได้ {item.qty} ชิ้น • ยอด ฿{item.revenue.toFixed(0)}</span>
-                      <span className="font-semibold text-emerald-600">GP {gp}% (สัดส่วน {profitShare}%)</span>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500">
+                      <span>ขาย {item.qty} ชิ้น • ยอด ฿{item.revenue.toFixed(0)}</span>
+                      <span className="font-semibold text-emerald-600">GP {gp}%</span>
                     </div>
 
                     {/* Progress bar */}
-                    <div className="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                       <div
                         style={{ width: `${profitShare}%` }}
-                        className="h-full bg-primary rounded-full"
+                        className="h-full bg-emerald-600 rounded-full"
                       />
                     </div>
                   </div>
@@ -676,104 +642,104 @@ export default function AnalyticsTab({
             )}
           </div>
 
-          <div className="pt-2 border-t border-surface-container text-right text-[11px] text-on-surface-variant font-medium">
-            รวมกำไร 5 อันดับ: <span className="font-bold font-mono text-on-surface">฿{topContributors.reduce((s, it) => s + it.profit, 0).toFixed(2)}</span>
+          <div className="pt-3 border-t border-slate-100 text-right text-xs text-slate-500 font-medium">
+            รวมกำไร 5 อันดับ: <span className="font-bold font-mono text-slate-900">฿{topContributors.reduce((s, it) => s + it.profit, 0).toFixed(2)}</span>
           </div>
         </div>
       </section>
 
       {/* Condensed Real P&L Statement (งบกำไรขาดทุนย่อ) */}
-      <section className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high">
-        <div className="flex items-center justify-between pb-3 border-b border-surface-container">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-              <Receipt className="w-3.5 h-3.5" />
+      <section className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Receipt className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-xs text-on-surface">งบกำไรขาดทุนย่อ (Condensed P&amp;L Statement)</h3>
-              <p className="text-[10px] text-on-surface-variant">สรุปรายได้ หักต้นทุน FIFO และค่าใช้จ่ายดำเนินงานจริง</p>
+              <h3 className="font-bold text-sm text-slate-900">งบกำไรขาดทุนย่อ (Condensed P&L Statement)</h3>
+              <p className="text-xs text-slate-500">สรุปรายได้ หักต้นทุน FIFO และค่าใช้จ่ายดำเนินงานจริง</p>
             </div>
           </div>
-          <span className="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface text-[10px] font-mono font-semibold">
+          <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-mono font-semibold">
             {reportTimeframe === 'today' ? 'รายวัน' : reportTimeframe === 'week' ? 'สัปดาห์นี้' : reportTimeframe === 'month' ? 'รายเดือน' : 'สะสมทั้งหมด'}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 pt-3">
-          <div className="p-3 bg-surface-container-low rounded-xl border border-surface-container-high">
-            <span className="text-[11px] text-on-surface-variant block mb-1">1. รายได้จากการขาย (Revenue)</span>
-            <span className="text-base font-bold font-mono text-on-surface">฿{grossSales.toFixed(2)}</span>
-            <span className="text-[10px] text-on-surface-variant block mt-1">100.0% ของยอดขาย</span>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3.5 pt-4">
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="text-xs text-slate-500 block mb-1">1. รายได้จากการขาย (Revenue)</span>
+            <span className="text-lg font-bold font-mono text-slate-900">฿{grossSales.toFixed(2)}</span>
+            <span className="text-[11px] text-slate-400 block mt-1">100.0% ของยอดขาย</span>
           </div>
 
-          <div className="p-3 bg-surface-container-low rounded-xl border border-surface-container-high">
-            <span className="text-[11px] text-on-surface-variant block mb-1">2. ต้นทุนสินค้า FIFO (COGS)</span>
-            <span className="text-base font-bold font-mono text-slate-700">฿{totalCogs.toFixed(2)}</span>
-            <span className="text-[10px] text-on-surface-variant block mt-1">
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="text-xs text-slate-500 block mb-1">2. ต้นทุนสินค้า FIFO (COGS)</span>
+            <span className="text-lg font-bold font-mono text-slate-700">฿{totalCogs.toFixed(2)}</span>
+            <span className="text-[11px] text-slate-400 block mt-1">
               {grossSales > 0 ? ((totalCogs / grossSales) * 100).toFixed(1) : 0}% ของยอดขาย
             </span>
           </div>
 
-          <div className="p-3 bg-surface-container-low rounded-xl border border-surface-container-high">
-            <span className="text-[11px] text-primary font-semibold block mb-1">3. กำไรขั้นต้น (Gross Profit)</span>
-            <span className="text-base font-bold font-mono text-primary">฿{grossProfit.toFixed(2)}</span>
-            <span className="text-[10px] text-primary font-semibold block mt-1">GP Margin {gpMargin}%</span>
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="text-xs text-emerald-700 font-semibold block mb-1">3. กำไรขั้นต้น (Gross Profit)</span>
+            <span className="text-lg font-bold font-mono text-emerald-600">฿{grossProfit.toFixed(2)}</span>
+            <span className="text-[11px] text-emerald-600 font-semibold block mt-1">GP Margin {gpMargin}%</span>
           </div>
 
-          <div className="p-3 bg-surface-container-low rounded-xl border border-surface-container-high">
-            <span className="text-[11px] text-on-surface-variant block mb-1">4. ค่าใช้จ่ายดำเนินงาน (Expenses)</span>
-            <span className="text-base font-bold font-mono text-rose-600">฿{totalExpenses.toFixed(2)}</span>
-            <span className="text-[10px] text-on-surface-variant block mt-1">{filteredExpenses.length} รายการค่าใช้จ่าย</span>
+          <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span className="text-xs text-slate-500 block mb-1">4. ค่าใช้จ่ายดำเนินงาน (Expenses)</span>
+            <span className="text-lg font-bold font-mono text-rose-600">฿{totalExpenses.toFixed(2)}</span>
+            <span className="text-[11px] text-slate-400 block mt-1">{filteredExpenses.length} รายการค่าใช้จ่าย</span>
           </div>
 
-          <div className="p-3 bg-primary/5 rounded-xl border border-primary/20">
-            <span className="text-[11px] text-emerald-700 font-bold block mb-1">5. กำไรสุทธิ (Net Operating Profit)</span>
-            <span className={`text-base font-bold font-mono ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+          <div className="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-200">
+            <span className="text-xs text-emerald-800 font-bold block mb-1">5. กำไรสุทธิ (Net Profit)</span>
+            <span className={`text-lg font-bold font-mono ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
               ฿{netProfit.toFixed(2)}
             </span>
-            <span className="text-[10px] text-emerald-700 font-bold block mt-1">Net Margin {netMargin}%</span>
+            <span className="text-[11px] text-emerald-700 font-bold block mt-1">Net Margin {netMargin}%</span>
           </div>
         </div>
       </section>
 
-      {/* Lower Midnight Slate Section (Audit Tables) */}
-      <section className="bg-[#181824] text-inverse-on-surface rounded-2xl p-4 shadow-xl border border-white/10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+      {/* Audit Tables Section */}
+      <section className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveSubTab('orders')}
               type="button"
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 activeSubTab === 'orders'
-                  ? 'bg-primary-container text-white shadow-xs'
-                  : 'bg-white/10 hover:bg-white/15 text-inverse-on-surface/80 hover:text-white'
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
               }`}
             >
-              <Receipt className="w-3.5 h-3.5" />
+              <Receipt className="w-4 h-4" />
               <span>บันทึกออเดอร์ขายจริง ({filteredOrders.length})</span>
             </button>
 
             <button
               onClick={() => setActiveSubTab('stock_logs')}
               type="button"
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 activeSubTab === 'stock_logs'
-                  ? 'bg-primary-container text-white shadow-xs'
-                  : 'bg-white/10 hover:bg-white/15 text-inverse-on-surface/80 hover:text-white'
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
               }`}
             >
-              <History className="w-3.5 h-3.5" />
+              <History className="w-4 h-4" />
               <span>ประวัติเคลื่อนไหวสต็อกจริง ({stockLogs.length})</span>
             </button>
           </div>
 
-          <div className="relative min-w-[220px]">
-            <Search className="w-3.5 h-3.5 text-inverse-on-surface/50 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative min-w-[240px]">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="ค้นหาเลขบิล, สินค้า..."
-              className="w-full bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white placeholder:text-inverse-on-surface/40 text-xs pl-8 pr-3 py-1.5 rounded-full outline-none focus:ring-1 focus:ring-primary border border-white/5"
+              className="w-full bg-slate-50 border border-slate-200 text-slate-800 placeholder:text-slate-400 text-xs pl-9 pr-3.5 py-2 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
             />
           </div>
         </div>
@@ -782,13 +748,13 @@ export default function AnalyticsTab({
         {activeSubTab === 'orders' && (
           <div className="w-full overflow-x-auto pt-2">
             {searchedOrders.length === 0 ? (
-              <div className="py-12 text-center text-inverse-on-surface/40 text-xs">
+              <div className="py-12 text-center text-slate-400 text-xs">
                 ไม่พบรายการออเดอร์ในช่วงเวลานี้
               </div>
             ) : (
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="text-inverse-on-surface/60 border-b border-white/10 pb-2">
+                  <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-700">
                     <th className="py-2.5 px-3 font-semibold">รหัสบิล</th>
                     <th className="py-2.5 px-3 font-semibold">วัน-เวลา</th>
                     <th className="py-2.5 px-3 font-semibold">รายการสินค้า</th>
@@ -799,7 +765,7 @@ export default function AnalyticsTab({
                     <th className="py-2.5 px-3 font-semibold text-right">ใบเสร็จ</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-slate-100 text-slate-700">
                   {searchedOrders.map((ord) => {
                     const cogs = ord.items?.reduce(
                       (s, it) => s + ((it.unit_cost || 0) * (it.quantity || 1)),
@@ -809,39 +775,39 @@ export default function AnalyticsTab({
                     const gp = ord.total_amount > 0 ? ((profit / ord.total_amount) * 100).toFixed(1) : 0;
 
                     return (
-                      <tr key={ord.id} className="hover:bg-white/5 transition-colors">
-                        <td className="py-2.5 px-3 font-mono font-bold text-white">
+                      <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
                           {ord.order_no}
                         </td>
-                        <td className="py-2.5 px-3 text-inverse-on-surface/70 whitespace-nowrap">
+                        <td className="py-2.5 px-3 text-slate-500 whitespace-nowrap">
                           {new Date(ord.created_at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}
                         </td>
                         <td className="py-2.5 px-3">
-                          <span className="text-white truncate block max-w-[200px]" title={ord.items?.map((it) => `${it.product_name} (${it.quantity})`).join(', ')}>
+                          <span className="text-slate-800 truncate block max-w-[220px]" title={ord.items?.map((it) => `${it.product_name} (${it.quantity})`).join(', ')}>
                             {ord.items?.map((it) => it.product_name).join(', ') || 'สินค้าทั่วไป'}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-white">
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
                           ฿{(ord.total_amount || 0).toFixed(2)}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-inverse-on-surface/70">
+                        <td className="py-2.5 px-3 text-right font-mono text-slate-500">
                           ฿{cogs.toFixed(2)}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-primary-fixed">
-                          +฿{profit.toFixed(2)} <span className="text-[10px] text-inverse-on-surface/50 font-normal">({gp}%)</span>
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-600">
+                          +฿{profit.toFixed(2)} <span className="text-[10px] text-slate-400 font-normal">({gp}%)</span>
                         </td>
                         <td className="py-2.5 px-3 text-center">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             ลงบัญชีแล้ว
                           </span>
                         </td>
                         <td className="py-2.5 px-3 text-right">
                           <button
                             onClick={() => onViewReceipt(ord)}
-                            className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-[11px] font-medium transition-colors flex items-center gap-1 ml-auto"
+                            className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-medium transition-colors flex items-center gap-1 ml-auto"
                             type="button"
                           >
-                            <Eye className="w-3 h-3" />
+                            <Eye className="w-3.5 h-3.5" />
                             <span>ดูบิล</span>
                           </button>
                         </td>
@@ -854,17 +820,17 @@ export default function AnalyticsTab({
           </div>
         )}
 
-        {/* Stock Logs Table (Fixed Real Database Mapping) */}
+        {/* Stock Logs Table */}
         {activeSubTab === 'stock_logs' && (
           <div className="w-full overflow-x-auto pt-2">
             {searchedStockLogs.length === 0 ? (
-              <div className="py-12 text-center text-inverse-on-surface/40 text-xs">
+              <div className="py-12 text-center text-slate-400 text-xs">
                 ยังไม่มีบันทึกประวัติการเคลื่อนไหวสต็อก
               </div>
             ) : (
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="text-inverse-on-surface/60 border-b border-white/10 pb-2">
+                  <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-700">
                     <th className="py-2.5 px-3 font-semibold">วัน-เวลา</th>
                     <th className="py-2.5 px-3 font-semibold">สินค้า</th>
                     <th className="py-2.5 px-3 font-semibold">ประเภทรายการ</th>
@@ -875,44 +841,44 @@ export default function AnalyticsTab({
                     <th className="py-2.5 px-3 font-semibold">หมายเหตุ / เลขที่บิล</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-slate-100 text-slate-700">
                   {searchedStockLogs.map((log) => {
                     const isPositive = log.change_qty > 0;
                     const isPurchase = log.type === 'PURCHASE_IN' || log.type === 'INITIAL_STOCK';
 
                     return (
-                      <tr key={log.id} className="hover:bg-white/5 transition-colors">
-                        <td className="py-2.5 px-3 font-mono text-inverse-on-surface/70 whitespace-nowrap">
+                      <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-2.5 px-3 font-mono text-slate-500 whitespace-nowrap">
                           {new Date(log.created_at || Date.now()).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}
                         </td>
-                        <td className="py-2.5 px-3 font-medium text-white">
-                          <div className="truncate max-w-[180px]">{log.product_name || 'สินค้า'}</div>
-                          {log.barcode && <span className="text-[10px] text-inverse-on-surface/50 font-mono">{log.barcode}</span>}
+                        <td className="py-2.5 px-3 font-medium text-slate-900">
+                          <div className="truncate max-w-[200px]">{log.product_name || 'สินค้า'}</div>
+                          {log.barcode && <span className="text-[10px] text-slate-400 font-mono">{log.barcode}</span>}
                         </td>
                         <td className="py-2.5 px-3">
                           <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
                               isPurchase
-                                ? 'bg-emerald-500/20 text-emerald-300'
-                                : 'bg-rose-500/20 text-rose-300'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : 'bg-rose-50 text-rose-700 border-rose-200'
                             }`}
                           >
                             {log.type === 'PURCHASE_IN' ? 'รับเข้าสต็อก' : log.type === 'INITIAL_STOCK' ? 'สต็อกเริ่มต้น' : 'ตัดสต็อกขาย'}
                           </span>
                         </td>
-                        <td className={`py-2.5 px-3 text-right font-mono font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        <td className={`py-2.5 px-3 text-right font-mono font-bold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
                           {isPositive ? `+${log.change_qty}` : `${log.change_qty}`}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-inverse-on-surface/70">
+                        <td className="py-2.5 px-3 text-right font-mono text-slate-600">
                           ฿{(log.unit_cost || 0).toFixed(2)}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-white">
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
                           ฿{(log.total_cost || Math.abs(log.change_qty * (log.unit_cost || 0))).toFixed(2)}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-primary-fixed">
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
                           {log.current_stock !== undefined && log.current_stock !== null ? `${log.current_stock} ชิ้น` : '-'}
                         </td>
-                        <td className="py-2.5 px-3 text-inverse-on-surface/60">{log.note || '-'}</td>
+                        <td className="py-2.5 px-3 text-slate-500">{log.note || '-'}</td>
                       </tr>
                     );
                   })}

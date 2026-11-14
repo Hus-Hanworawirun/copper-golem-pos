@@ -25,7 +25,7 @@ export default function ReceiptsTab({
     const matchesSearch =
       !search ||
       ord.order_no.toLowerCase().includes(search.toLowerCase()) ||
-      ord.payment_method.toLowerCase().includes(search.toLowerCase()) ||
+      (ord.payment_method && ord.payment_method.toLowerCase().includes(search.toLowerCase())) ||
       ord.items?.some((it) => it.product_name.toLowerCase().includes(search.toLowerCase()));
 
     if (!matchesSearch) return false;
@@ -71,7 +71,7 @@ export default function ReceiptsTab({
         ord.items?.length || 0,
         (ord.total_amount || 0).toFixed(2),
         vat.toFixed(2),
-        ord.payment_method,
+        ord.payment_method || 'เงินสด',
         (ord.cash_received || 0).toFixed(2),
         (ord.change_amount || 0).toFixed(2)
       ];
@@ -89,35 +89,25 @@ export default function ReceiptsTab({
   };
 
   return (
-    <div className="w-full p-4 lg:p-6 space-y-4 max-w-7xl mx-auto">
+    <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif]">
       {/* Header Bar */}
-      <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-1.5 text-xs text-on-surface-variant mb-1">
-            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold uppercase tracking-wide">
-              E-Archive v2.4
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <Database className="w-3.5 h-3.5 text-primary" />
-              <span>Local Storage 100% Sync</span>
-            </span>
-          </div>
-          <h1 className="text-xl lg:text-2xl font-bold text-on-surface tracking-tight">
-            ประวัติใบเสร็จดิจิทัล &amp; คลังบิลอิเล็กทรอนิกส์
+          <h1 className="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">
+            ประวัติใบเสร็จดิจิทัล & คลังบิลอิเล็กทรอนิกส์
           </h1>
-          <p className="text-xs text-on-surface-variant mt-0.5">
+          <p className="text-xs text-slate-500 mt-1">
             Digital Receipts Archive — บันทึกถาวรในเครื่องแบบ SQLite WAL ค้นหาย้อนหลัง พิมพ์ซ้ำ และออกใบกำกับภาษีอย่างย่อ (ABB)
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={handleExportCsv}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface text-xs font-semibold shadow-xs hover:bg-surface-container border border-surface-container-high transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm border border-slate-200 transition-all"
             type="button"
           >
-            <FileDown className="w-3.5 h-3.5 text-on-surface-variant" />
+            <FileDown className="w-4 h-4 text-slate-500" />
             <span>ดาวน์โหลด .CSV</span>
           </button>
           <button
@@ -125,99 +115,102 @@ export default function ReceiptsTab({
               if (activeOrder) onPrintThermal(activeOrder);
               else alert('กรุณาเลือกบิลเพื่อพิมพ์');
             }}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary-container text-white text-xs font-bold shadow-md hover:bg-primary transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all"
             type="button"
           >
-            <Printer className="w-3.5 h-3.5" />
+            <Printer className="w-4 h-4" />
             <span>พิมพ์สลิปบิลที่เลือก</span>
           </button>
         </div>
       </section>
 
       {/* 4 KPI Metric Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-on-surface-variant uppercase font-medium">
+              <span className="text-xs text-slate-500 font-medium">
                 ใบเสร็จ ({dateFilter === 'today' ? 'วันนี้' : dateFilter === '7days' ? '7 วัน' : 'ทั้งหมด'})
               </span>
-              <div className="text-xl font-bold text-on-surface mt-1 font-mono">
-                {totalBills} <span className="text-sm font-normal text-on-surface-variant">บิล</span>
+              <div className="text-2xl font-bold text-slate-900 mt-1 font-mono">
+                {totalBills} <span className="text-sm font-normal text-slate-400">บิล</span>
               </div>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
               <Receipt className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-[11px] text-primary font-semibold">Local WAL Active</div>
+          <div className="mt-3 text-xs text-emerald-600 font-medium flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>Local SQLite Active</span>
+          </div>
         </div>
 
         {/* Card 2 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-on-surface-variant uppercase font-medium">ยอดขายรวมบิลที่ค้นพบ</span>
-              <div className="text-xl font-bold text-on-surface mt-1 font-mono">
+              <span className="text-xs text-slate-500 font-medium">ยอดขายรวมบิลที่ค้นพบ</span>
+              <div className="text-2xl font-bold text-slate-900 mt-1 font-mono">
                 ฿{totalGross.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
               <Banknote className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-[11px] text-on-surface-variant">เฉลี่ย ฿{avgBill}/บิล</div>
+          <div className="mt-3 text-xs text-slate-400">เฉลี่ย ฿{avgBill}/บิล</div>
         </div>
 
         {/* Card 3 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-on-surface-variant uppercase font-medium">กำไรขั้นต้นรวม (Gross Profit)</span>
-              <div className="text-xl font-bold text-on-surface mt-1 font-mono">
+              <span className="text-xs text-slate-500 font-medium">กำไรขั้นต้นรวม (Gross Profit)</span>
+              <div className="text-2xl font-bold text-emerald-600 mt-1 font-mono">
                 ฿{totalProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-[11px] text-emerald-600 font-semibold font-mono">
+          <div className="mt-3 text-xs text-emerald-600 font-semibold font-mono">
             อัตรากำไรเฉลี่ย {avgProfitMargin}% GP
           </div>
         </div>
 
         {/* Card 4 */}
-        <div className="bg-surface-container-lowest rounded-2xl p-4 shadow-xs border border-surface-container-high flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-on-surface-variant uppercase font-medium">สถานะฐานข้อมูล</span>
-              <div className="text-xl font-bold text-primary mt-1">100% Sync</div>
+              <span className="text-xs text-slate-500 font-medium">สถานะฐานข้อมูล</span>
+              <div className="text-2xl font-bold text-slate-900 mt-1">100% Sync</div>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-[11px] text-on-surface-variant">Offline-First Engine</div>
+          <div className="mt-3 text-xs text-slate-400">Offline-First Engine</div>
         </div>
       </section>
 
       {/* Split Drawer: Left List (7 Cols) + Right Live Slip (5 Cols) */}
-      <section className="bg-[#181824] text-inverse-on-surface rounded-2xl p-4 shadow-xl border border-white/10">
+      <section className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
         {/* Controls Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-inverse-on-surface/50 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="ค้นหาเลขที่บิล, สินค้า, หรือวิธีชำระ..."
-              className="w-full bg-white/10 hover:bg-white/15 focus:bg-white/20 text-white placeholder:text-inverse-on-surface/40 text-xs pl-9 pr-3 py-1.5 rounded-full outline-none focus:ring-1 focus:ring-primary border border-white/5"
+              placeholder="ค้นหาเลขที่บิล, สินค้า..."
+              className="w-full bg-slate-50 border border-slate-200 text-slate-800 placeholder:text-slate-400 text-xs pl-9 pr-3.5 py-2 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+          <div className="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200">
             {[
               { id: 'all', label: 'ทั้งหมด' },
               { id: 'today', label: 'วันนี้' },
@@ -229,10 +222,10 @@ export default function ReceiptsTab({
                   key={pill.id}
                   onClick={() => setDateFilter(pill.id)}
                   type="button"
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     isActive
-                      ? 'bg-primary-container text-white shadow-xs'
-                      : 'bg-white/10 hover:bg-white/15 text-inverse-on-surface/80 hover:text-white'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   {pill.label}
@@ -243,11 +236,11 @@ export default function ReceiptsTab({
         </div>
 
         {/* Split Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-3 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-4 items-start">
           {/* LEFT 7 COLS: Receipts List */}
-          <div className="lg:col-span-7 space-y-2 max-h-[580px] overflow-y-auto pr-1 scrollbar-none">
+          <div className="lg:col-span-7 space-y-2 max-h-[580px] overflow-y-auto pr-1">
             {filteredOrders.length === 0 ? (
-              <div className="py-12 text-center text-inverse-on-surface/40 text-xs">
+              <div className="py-12 text-center text-slate-400 text-xs">
                 ไม่พบบันทึกใบเสร็จในระบบ
               </div>
             ) : (
@@ -260,16 +253,16 @@ export default function ReceiptsTab({
                   <div
                     key={ord.id}
                     onClick={() => setSelectedOrder(ord)}
-                    className={`group relative flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all border ${
+                    className={`group relative flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all border ${
                       isSelected
-                        ? 'bg-primary-container text-white shadow-md border-transparent'
-                        : 'bg-white/5 hover:bg-white/10 text-inverse-on-surface border-white/5'
+                        ? 'bg-slate-900 text-white shadow-md border-slate-900'
+                        : 'bg-slate-50 hover:bg-slate-100/80 text-slate-800 border-slate-200/80'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-3">
                       <div
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                          isSelected ? 'bg-white/20 text-white' : 'bg-white/10 text-inverse-on-surface/80'
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          isSelected ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-700'
                         }`}
                       >
                         <Receipt className="w-4 h-4" />
@@ -279,14 +272,14 @@ export default function ReceiptsTab({
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-xs font-mono">{ord.order_no}</span>
                           {isSelected && (
-                            <span className="px-1.5 py-0.2 rounded-full bg-white text-primary text-[10px] font-bold">
+                            <span className="px-1.5 py-0.5 rounded-md bg-emerald-500 text-white text-[10px] font-bold">
                               กำลังดู
                             </span>
                           )}
                         </div>
                         <div
-                          className={`text-[11px] mt-0.5 ${
-                            isSelected ? 'text-white/80' : 'text-inverse-on-surface/60'
+                          className={`text-xs mt-0.5 ${
+                            isSelected ? 'text-slate-300' : 'text-slate-500'
                           }`}
                         >
                           {new Date(ord.created_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น. • {itemCount} ชิ้น
@@ -294,24 +287,24 @@ export default function ReceiptsTab({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
                           isSelected
-                            ? 'bg-white/20 text-white'
-                            : 'bg-emerald-400/20 text-emerald-300'
+                            ? 'bg-white/20 text-white border-transparent'
+                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
                         }`}
                       >
                         บันทึกบัญชีแล้ว
                       </span>
 
                       <div className="text-right">
-                        <div className="font-bold font-mono text-sm">
+                        <div className={`font-bold font-mono text-sm ${isSelected ? 'text-white' : 'text-slate-900'}`}>
                           ฿{(ord.total_amount || 0).toFixed(2)}
                         </div>
                         <div
                           className={`text-[10px] font-mono ${
-                            isSelected ? 'text-white/80' : 'text-inverse-on-surface/50'
+                            isSelected ? 'text-slate-300' : 'text-slate-400'
                           }`}
                         >
                           VAT ฿{vat.toFixed(2)}
@@ -320,7 +313,7 @@ export default function ReceiptsTab({
 
                       <ChevronRight
                         className={`w-4 h-4 transition-transform ${
-                          isSelected ? 'text-white translate-x-0.5' : 'text-inverse-on-surface/40'
+                          isSelected ? 'text-white translate-x-0.5' : 'text-slate-400'
                         }`}
                       />
                     </div>
@@ -333,10 +326,10 @@ export default function ReceiptsTab({
           {/* RIGHT 5 COLS: Thermal Slip Preview */}
           <div className="lg:col-span-5">
             {activeOrder ? (
-              <div className="bg-surface-container-lowest text-on-surface rounded-2xl p-4 shadow-xl border border-surface-container-high flex flex-col font-mono text-xs">
+              <div className="bg-slate-50 text-slate-800 rounded-2xl p-5 border border-slate-200 flex flex-col font-mono text-xs shadow-inner">
                 {/* Header */}
-                <div className="text-center pb-2 border-b border-dashed border-outline-variant">
-                  <div className="w-8 h-8 rounded-xl bg-primary text-white mx-auto flex items-center justify-center font-bold mb-1 shadow-xs overflow-hidden">
+                <div className="text-center pb-3 border-b border-dashed border-slate-300">
+                  <div className="w-8 h-8 rounded-xl bg-slate-900 text-white mx-auto flex items-center justify-center font-bold mb-1 shadow-xs overflow-hidden">
                     <img
                       src="/logo.png"
                       alt=""
@@ -344,24 +337,24 @@ export default function ReceiptsTab({
                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
-                  <div className="font-bold text-sm text-on-surface font-sans">
-                    COPPER GOLEM POS &amp; RETAIL
+                  <div className="font-bold text-sm text-slate-900 font-sans">
+                    COPPER GOLEM POS
                   </div>
-                  <div className="text-[10px] text-on-surface-variant font-sans">
+                  <div className="text-[10px] text-slate-500 font-sans">
                     ระบบขายปลีกและบันทึกบัญชีสินค้า
                   </div>
-                  <div className="text-[10px] text-on-surface-variant font-sans">
+                  <div className="text-[10px] text-slate-500 font-sans">
                     เลขประจำตัวผู้เสียภาษี: 0105566012345
                   </div>
-                  <div className="mt-1.5 inline-block px-2.5 py-0.5 rounded-full bg-surface-container text-primary font-sans text-[11px] font-bold">
+                  <div className="mt-2 inline-block px-2.5 py-0.5 rounded-full bg-slate-200/80 text-slate-800 font-sans text-[11px] font-bold">
                     ใบกำกับภาษีอย่างย่อ (ABB)
                   </div>
                 </div>
 
                 {/* Slip Meta */}
-                <div className="py-2 border-b border-dashed border-outline-variant flex flex-col gap-0.5 font-sans text-on-surface-variant text-[11px]">
+                <div className="py-2.5 border-b border-dashed border-slate-300 flex flex-col gap-0.5 font-sans text-slate-600 text-xs">
                   <div className="flex justify-between">
-                    <span>เลขที่บิล: <strong className="text-on-surface font-mono">{activeOrder.order_no}</strong></span>
+                    <span>เลขที่บิล: <strong className="text-slate-900 font-mono">{activeOrder.order_no}</strong></span>
                     <span>แคชเชียร์ 01</span>
                   </div>
                   <div className="flex justify-between">
@@ -371,12 +364,12 @@ export default function ReceiptsTab({
                 </div>
 
                 {/* Items */}
-                <div className="py-2 border-b border-dashed border-outline-variant space-y-1 font-sans">
+                <div className="py-2.5 border-b border-dashed border-slate-300 space-y-1.5 font-sans">
                   {activeOrder.items?.map((it, idx) => (
-                    <div key={idx} className="flex justify-between text-on-surface text-[11px]">
+                    <div key={idx} className="flex justify-between text-slate-800 text-xs">
                       <div>
                         <span className="font-semibold">{idx + 1}. {it.product_name}</span>
-                        <div className="text-[10px] text-on-surface-variant pl-2">
+                        <div className="text-[11px] text-slate-500 pl-2">
                           {it.quantity}x @ ฿{(it.unit_price || 0).toFixed(2)}
                         </div>
                       </div>
@@ -388,29 +381,29 @@ export default function ReceiptsTab({
                 </div>
 
                 {/* Totals */}
-                <div className="py-2 border-b border-dashed border-outline-variant space-y-0.5 font-sans text-[11px]">
-                  <div className="flex justify-between text-on-surface-variant">
+                <div className="py-2.5 border-b border-dashed border-slate-300 space-y-1 font-sans text-xs">
+                  <div className="flex justify-between text-slate-500">
                     <span>ยอดรวมสินค้า</span>
                     <span className="font-mono">฿{(activeOrder.total_amount || 0).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-on-surface-variant">
+                  <div className="flex justify-between text-slate-500">
                     <span>ภาษีมูลค่าเพิ่ม VAT 7%</span>
                     <span className="font-mono">฿{((activeOrder.total_amount || 0) * 7 / 107).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-on-surface font-bold text-sm pt-1 border-t border-surface-container">
+                  <div className="flex justify-between text-slate-900 font-bold text-sm pt-1.5 border-t border-slate-200">
                     <span>ยอดสุทธิ</span>
-                    <span className="font-mono text-primary font-bold">
+                    <span className="font-mono text-emerald-600 font-bold">
                       ฿{(activeOrder.total_amount || 0).toFixed(2)}
                     </span>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="grid grid-cols-2 gap-2 pt-3 font-sans">
+                <div className="grid grid-cols-2 gap-2.5 pt-3.5 font-sans">
                   <button
                     onClick={() => onPrintThermal(activeOrder)}
                     type="button"
-                    className="py-2 px-3 rounded-full bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95"
+                    className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
                   >
                     <Printer className="w-3.5 h-3.5" />
                     <span>พิมพ์สลิปซ้ำ</span>
@@ -419,7 +412,7 @@ export default function ReceiptsTab({
                   <button
                     onClick={() => window.print()}
                     type="button"
-                    className="py-2 px-3 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold flex items-center justify-center gap-1.5 border border-surface-container-high transition-all"
+                    className="py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 border border-slate-200 transition-all"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>บันทึก PDF</span>
@@ -427,7 +420,7 @@ export default function ReceiptsTab({
                 </div>
               </div>
             ) : (
-              <div className="p-8 text-center text-inverse-on-surface/40 text-xs border border-white/10 rounded-2xl bg-white/5">
+              <div className="p-8 text-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl bg-slate-50">
                 เลือกใบเสร็จเพื่อดูตัวอย่าง
               </div>
             )}

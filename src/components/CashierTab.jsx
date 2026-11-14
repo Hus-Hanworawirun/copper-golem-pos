@@ -1,24 +1,24 @@
 import React, { useRef, useEffect } from 'react';
 import {
-  ScanLine,
-  PlusCircle,
+  Search,
+  X,
   Package,
   Plus,
-  Minus,
-  Trash2,
-  Printer,
-  Receipt,
-  Calculator,
-  CheckCircle2,
-  Lock,
-  Search,
   ShoppingBag,
-  Coins
+  Trash2,
+  MinusCircle,
+  PlusCircle,
+  DollarSign,
+  Receipt,
+  History,
+  Coins,
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
 
 export default function CashierTab({
-  products,
-  cart,
+  products = [],
+  cart = [],
   addToCart,
   updateCartQty,
   removeFromCart,
@@ -27,11 +27,14 @@ export default function CashierTab({
   setSearchQuery,
   selectedCategory,
   setSelectedCategory,
-  categories,
+  categories = [],
   cashReceived,
   setCashReceived,
   onCheckout,
-  onOpenAddProduct
+  onOpenAddProduct,
+  onViewLatestReceipt,
+  onGoToReceipts,
+  orderHistoryCount = 0
 }) {
   const searchInputRef = useRef(null);
 
@@ -42,7 +45,7 @@ export default function CashierTab({
   const grossProfit = totalAmount - totalCogs;
   const gpPercent = totalAmount > 0 ? ((grossProfit / totalAmount) * 100).toFixed(1) : 0;
 
-  // Thai VAT 7% calculation
+  // Thai VAT 7%
   const vatAmount = Number((totalAmount * 7 / 107).toFixed(2));
   const preVatAmount = Number((totalAmount - vatAmount).toFixed(2));
 
@@ -51,7 +54,7 @@ export default function CashierTab({
   const changeDue = receivedNum >= totalAmount ? Number((receivedNum - totalAmount).toFixed(2)) : 0;
 
   // Filtered Products
-  const filteredProducts = products.filter(p => {
+  const filteredProducts = products.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.barcode && p.barcode.includes(searchQuery));
@@ -77,193 +80,168 @@ export default function CashierTab({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cart, onCheckout]);
 
-  // Quick tender suggestions
   const getQuickTenderOptions = () => {
     if (totalAmount <= 0) return [100, 500, 1000];
-    const opts = [totalAmount];
-    const hundreds = Math.ceil(totalAmount / 100) * 100;
-    if (hundreds > totalAmount && !opts.includes(hundreds)) opts.push(hundreds);
-    const fiveHundreds = Math.ceil(totalAmount / 500) * 500;
-    if (fiveHundreds > totalAmount && !opts.includes(fiveHundreds)) opts.push(fiveHundreds);
-    const thousands = Math.ceil(totalAmount / 1000) * 1000;
-    if (thousands > totalAmount && !opts.includes(thousands)) opts.push(thousands);
-    return opts.slice(0, 4);
+    const roundedExact = totalAmount;
+    const next100 = Math.ceil(totalAmount / 100) * 100;
+    const next500 = Math.ceil(totalAmount / 500) * 500;
+    const next1000 = Math.ceil(totalAmount / 1000) * 1000;
+    const set = new Set([roundedExact, next100, next500, next1000]);
+    return Array.from(set).sort((a, b) => a - b).slice(0, 4);
   };
 
   return (
-    <div className="h-full w-full flex flex-col xl:flex-row gap-4 p-4 min-h-0 overflow-hidden">
-      {/* LEFT: CATALOG SECTION */}
-      <div className="flex-1 min-w-0 h-full flex flex-col gap-3 min-h-0">
-        {/* Header & Search Bar */}
-        <div className="shrink-0 bg-surface p-3.5 rounded-2xl border border-surface-container-high shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
-                FAST-SCAN REGISTER ENGINE
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-              <span className="text-[11px] text-on-surface-variant">USB Barcode HID Direct</span>
-            </div>
-            <div className="flex items-baseline gap-2 mt-0.5">
-              <h1 className="text-lg font-bold text-on-surface">ขายหน้าร้าน (Register POS)</h1>
-              <span className="text-xs text-on-surface-variant hidden md:inline">
-                ระบบยิงบาร์โค้ด USB Focus-Free และคิดเงินอัตโนมัติ
-              </span>
-            </div>
+    <div className="flex-1 flex overflow-hidden font-['Prompt',sans-serif]">
+      {/* LEFT: PRODUCTS BROWSER & SCANNER */}
+      <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 border-r border-slate-200">
+        {/* Top Search & Category Filter Bar */}
+        <div className="p-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0">
+          <div className="relative flex-1 min-w-[220px]">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="พิมพ์ชื่อสินค้า หรือยิงบาร์โค้ด... (กด F2)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-800 placeholder:text-slate-400 font-sans"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Search Input with F2 */}
-            <div className="relative flex items-center min-w-[260px] sm:min-w-[300px]">
-              <ScanLine className="w-4 h-4 text-primary absolute left-3 pointer-events-none" />
-              <input
-                ref={searchInputRef}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ยิงบาร์โค้ด / ค้นหาชื่อสินค้า (กด F2)..."
-                type="text"
-                className="w-full pl-9 pr-12 py-2 bg-surface-container-lowest text-on-surface text-xs rounded-full border border-surface-container-high focus:outline-none focus:ring-2 focus:ring-primary shadow-xs font-sans"
-              />
-              <kbd className="absolute right-2.5 px-1.5 py-0.5 bg-surface-container text-on-surface-variant text-[10px] font-mono font-bold rounded-md border border-surface-container-high">
-                F2
-              </kbd>
-            </div>
+            <button
+              onClick={onViewLatestReceipt}
+              type="button"
+              title="เปิดดูใบเสร็จของบิลล่าสุดทันที"
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200"
+            >
+              <Receipt className="w-4 h-4 text-emerald-600" />
+              <span>บิลล่าสุด</span>
+            </button>
 
             <button
-              onClick={onOpenAddProduct}
+              onClick={onGoToReceipts}
               type="button"
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-surface-container-lowest hover:bg-surface-container text-on-surface text-xs font-semibold rounded-full border border-surface-container-high shadow-xs transition-colors shrink-0"
+              title="เปิดดูประวัติใบเสร็จและบิลย้อนหลังทั้งหมด"
+              className="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-blue-200"
             >
-              <PlusCircle className="w-4 h-4 text-primary" />
-              <span>เพิ่มสินค้าด่วน</span>
+              <History className="w-4 h-4 text-blue-600" />
+              <span>ค้นหาบิลย้อนหลัง ({orderHistoryCount})</span>
             </button>
           </div>
-        </div>
 
-        {/* Category Pills */}
-        <div className="shrink-0 bg-surface px-3 py-2 rounded-2xl border border-surface-container-high shadow-xs flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-            {categories.map((cat) => {
-              const isActive = selectedCategory === cat;
-              const count = cat === 'all'
-                ? products.length
-                : products.filter(p => p.category === cat).length;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  type="button"
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
-                    isActive
-                      ? 'bg-primary-container text-white shadow-xs'
-                      : 'bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface border border-surface-container-high'
-                  }`}
-                >
-                  {cat === 'all' ? 'ทั้งหมด' : cat} ({count})
-                </button>
-              );
-            })}
+          {/* Category Pills */}
+          <div className="w-full flex items-center gap-1.5 overflow-x-auto pt-1 scrollbar-none">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                  selectedCategory === cat
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200/60'
+                }`}
+              >
+                {cat === 'all' ? 'ทั้งหมด' : cat}
+              </button>
+            ))}
           </div>
-
-          <span className="text-[11px] text-outline shrink-0">
-            แสดง {filteredProducts.length} รายการ
-          </span>
         </div>
 
-        {/* Product Cards Grid (Scrollable) */}
-        <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+        {/* Product Grid Area */}
+        <div className="flex-1 overflow-y-auto p-4">
           {filteredProducts.length === 0 ? (
-            <div className="h-64 bg-surface-container-lowest rounded-2xl border border-surface-container-high flex flex-col items-center justify-center p-6 text-center">
-              <Package className="w-10 h-10 text-outline mb-2" />
-              <h3 className="font-bold text-sm text-on-surface mb-1">ไม่พบสินค้าในระบบ</h3>
-              <p className="text-xs text-on-surface-variant mb-3">
-                ค้นหาด้วยคำอื่น หรือกดปุ่มด้านล่างเพื่อเพิ่มสินค้า
+            <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-slate-400 py-12">
+              <Package className="w-14 h-14 stroke-[1.5] mb-3 text-slate-300" />
+              <p className="text-base font-bold text-slate-700">ไม่พบสินค้าในระบบ</p>
+              <p className="text-xs text-slate-500 max-w-sm text-center mt-1 mb-4">
+                เริ่มต้นเพิ่มสินค้าของคุณ หรือคลิกปุ่มด้านล่างเพื่อเพิ่มสินค้าใหม่
               </p>
               <button
-                onClick={onOpenAddProduct}
                 type="button"
-                className="px-4 py-2 bg-primary-container text-white text-xs font-bold rounded-full shadow-sm flex items-center gap-1.5"
+                onClick={onOpenAddProduct}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm shadow-emerald-600/20"
               >
-                <Plus className="w-4 h-4" />
-                <span>เพิ่มสินค้าใหม่</span>
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ เพิ่มสินค้าใหม่</span>
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-              {filteredProducts.map((prod) => {
-                const isLowStock = prod.stock_qty <= (prod.min_stock || 5);
-                const isOutOfStock = prod.stock_qty <= 0;
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+              {filteredProducts.map((p) => {
+                const isOutOfStock = p.stock_qty <= 0;
+                const isLowStock = p.stock_qty <= p.min_stock && !isOutOfStock;
 
                 return (
                   <div
-                    key={prod.id}
-                    className={`group bg-surface-container-lowest rounded-xl overflow-hidden border border-surface-container-high shadow-xs hover:shadow-md transition-all flex flex-col justify-between ${
-                      isOutOfStock ? 'opacity-60 grayscale' : ''
+                    key={p.id}
+                    onClick={() => !isOutOfStock && addToCart(p)}
+                    className={`bg-white rounded-2xl border transition-all duration-150 flex flex-col overflow-hidden text-left relative group ${
+                      isOutOfStock
+                        ? 'opacity-60 cursor-not-allowed border-slate-200 bg-slate-50'
+                        : 'cursor-pointer hover:shadow-md hover:border-emerald-400 hover:-translate-y-0.5 border-slate-200 shadow-xs'
                     }`}
                   >
-                    {/* Image Area */}
-                    <div className="relative h-28 w-full bg-surface-container flex items-center justify-center overflow-hidden">
-                      {prod.image_url ? (
+                    {/* Image / Icon container */}
+                    <div className="h-32 w-full bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                      {p.image_url ? (
                         <img
-                          src={prod.image_url}
-                          alt={prod.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          src={p.image_url}
+                          alt={p.name}
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
                         />
                       ) : (
-                        <div className="flex flex-col items-center justify-center text-outline">
-                          <Package className="w-8 h-8 text-outline/60" />
-                          <span className="text-[10px] mt-1 font-sans">{prod.category || 'สินค้า'}</span>
+                        <div className="text-slate-300 flex flex-col items-center gap-1">
+                          <Package className="w-8 h-8" />
+                          <span className="text-[10px]">ไม่มีรูป</span>
                         </div>
                       )}
 
-                      {/* Barcode Badge */}
-                      <div className="absolute top-1.5 left-1.5 px-2 py-0.5 bg-inverse-surface/85 backdrop-blur-xs rounded-full text-white text-[10px] font-mono shadow-xs">
-                        #{prod.barcode || prod.id}
-                      </div>
-
-                      {/* Stock Badge */}
-                      <div
-                        className={`absolute top-1.5 right-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-xs ${
+                      {/* Stock Pill Badge (Top Right) */}
+                      <span
+                        className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[11px] font-bold shadow-xs ${
                           isOutOfStock
                             ? 'bg-rose-500 text-white'
                             : isLowStock
-                            ? 'bg-amber-100 text-amber-900 border border-amber-300 animate-pulse'
-                            : 'bg-primary-fixed text-on-primary-fixed'
+                            ? 'bg-amber-500 text-white'
+                            : 'bg-slate-900/80 text-white backdrop-blur-xs'
                         }`}
                       >
-                        {isOutOfStock ? 'หมด' : `คงเหลือ ${prod.stock_qty}`}
-                      </div>
+                        {isOutOfStock ? 'หมด' : `เหลือ ${p.stock_qty}`}
+                      </span>
                     </div>
 
-                    {/* Card Content */}
-                    <div className="p-3 flex flex-col justify-between flex-1 gap-2">
+                    {/* Product Details */}
+                    <div className="p-3 flex-1 flex flex-col justify-between">
                       <div>
-                        <h3 className="font-bold text-xs text-on-surface line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                          {prod.name}
-                        </h3>
-                        <p className="text-[11px] text-on-surface-variant mt-1 line-clamp-1 font-sans">
-                          {prod.category || 'ทั่วไป'} • ทุน ฿{(prod.cost_price || 0).toFixed(2)}
+                        <p className="text-[11px] font-mono text-slate-400 truncate">
+                          {p.barcode || '#-'}
                         </p>
+                        <h3 className="font-semibold text-xs text-slate-800 line-clamp-2 mt-0.5 leading-snug">
+                          {p.name}
+                        </h3>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-surface-container">
-                        <span className="font-bold text-sm text-primary font-mono">
-                          ฿{Number(prod.sell_price).toFixed(2)}
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                          <span className="text-xs text-slate-400 font-normal">ขาย</span>
+                          <span className="text-sm font-bold text-emerald-600 ml-1 font-mono">
+                            ฿{Number(p.sell_price).toFixed(2)}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 font-normal font-mono">
+                          ทุน ฿{(p.cost_price || 0).toFixed(0)}
                         </span>
-
-                        <button
-                          onClick={() => addToCart(prod)}
-                          disabled={isOutOfStock}
-                          className={`w-7 h-7 rounded-full flex items-center justify-center shadow-xs active:scale-95 transition-all ${
-                            isOutOfStock
-                              ? 'bg-surface-container text-outline cursor-not-allowed'
-                              : 'bg-primary hover:bg-primary-container text-white shadow-primary/20'
-                          }`}
-                          type="button"
-                          title={isOutOfStock ? 'สินค้าหมด' : 'เพิ่มลงตะกร้า'}
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -274,154 +252,133 @@ export default function CashierTab({
         </div>
       </div>
 
-      {/* RIGHT: MIDNIGHT SLATE CART CONSOLE (Fixed Height, No Overflow Cutoff) */}
-      <div className="w-full xl:w-[420px] 2xl:w-[460px] shrink-0 h-full flex flex-col bg-[#181824] rounded-2xl p-3.5 text-inverse-on-surface shadow-2xl border border-white/10 overflow-hidden relative">
-        {/* Glow */}
-        <div className="absolute -top-24 -right-24 w-60 h-60 bg-primary-container/15 rounded-full blur-3xl pointer-events-none"></div>
-
-        {/* Drawer Header */}
-        <div className="shrink-0 flex items-center justify-between pb-2.5 border-b border-white/10 relative z-10">
+      {/* RIGHT: CART CONSOLE (Exact Old Clean White Style) */}
+      <div className="w-96 bg-white border-l border-slate-200 flex flex-col shrink-0 select-none">
+        {/* Cart Header */}
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary-container/20 text-primary-fixed flex items-center justify-center">
-              <ShoppingBag className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-xs text-white">
-                  บิลปัจจุบัน ({totalItems} ชิ้น)
-                </span>
-                <span className="px-1.5 py-0.2 rounded-full bg-primary-container text-white text-[10px] font-bold">
-                  Active Cart
-                </span>
-              </div>
-              <span className="text-[10px] text-inverse-on-surface/60 block">
-                Takeaway • บันทึกอัตโนมัติ SQLite WAL
-              </span>
-            </div>
+            <ShoppingBag className="w-5 h-5 text-emerald-600" />
+            <h2 className="font-bold text-slate-800 text-sm">รายการสินค้าในตะกร้า</h2>
           </div>
-
-          <button
-            onClick={clearCart}
-            disabled={cart.length === 0}
-            className="px-2 py-1 rounded-full bg-white/5 hover:bg-white/15 disabled:opacity-30 text-inverse-on-surface/80 hover:text-white text-[11px] transition-colors flex items-center gap-1 border border-white/5"
-            type="button"
-          >
-            <Trash2 className="w-3 h-3" />
-            <span>ล้าง</span>
-          </button>
+          {cart.length > 0 && (
+            <button
+              onClick={clearCart}
+              type="button"
+              className="text-xs text-rose-500 hover:text-rose-700 font-medium transition-colors"
+            >
+              ล้างตะกร้า
+            </button>
+          )}
         </div>
 
-        {/* Cart Item List (Flex-1 scrollable) */}
-        <div className="flex-1 min-h-[90px] overflow-y-auto py-2 pr-1 space-y-1.5 scrollbar-none relative z-10">
+        {/* Cart Item List */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center text-inverse-on-surface/40 py-6">
-              <ShoppingBag className="w-8 h-8 mb-1.5 opacity-50" />
-              <span className="text-xs font-medium">ตะกร้ายังว่างอยู่</span>
-              <span className="text-[10px]">ยิงบาร์โค้ด หรือคลิกเลือกสินค้าเพื่อเริ่มคิดเงิน</span>
+            <div className="h-full flex flex-col items-center justify-center text-slate-400 py-12">
+              <ShoppingBag className="w-12 h-12 stroke-[1.5] mb-2 text-slate-200" />
+              <p className="text-sm font-medium">ตะกร้าว่างเปล่า</p>
+              <p className="text-xs text-slate-400 mt-1">คลิกสินค้าหรือยิงบาร์โค้ดเพื่อเพิ่มรายการ</p>
             </div>
           ) : (
-            cart.map((item, idx) => (
+            cart.map((item) => (
               <div
                 key={item.product_id}
-                className="flex items-center justify-between p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 text-xs transition-colors"
+                className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center gap-3 transition-colors hover:border-slate-300"
               >
-                <div className="flex items-center gap-2 min-w-0 pr-1">
-                  <div className="w-6 h-6 rounded-md bg-white/10 text-primary-fixed flex items-center justify-center font-mono text-[10px] font-bold shrink-0">
-                    {String(idx + 1).padStart(2, '0')}
-                  </div>
-                  <div className="flex flex-col truncate">
-                    <span className="font-bold text-white truncate text-[11px]">
-                      {item.name}
-                    </span>
-                    <span className="text-[10px] text-inverse-on-surface/60 font-mono">
-                      ฿{item.unit_price.toFixed(2)} x {item.quantity} (FIFO ฿{(item.unit_cost || 0).toFixed(2)})
-                    </span>
-                  </div>
+                <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                  {item.image_url ? (
+                    <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <Package className="w-5 h-5 text-slate-300" />
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="flex items-center bg-[#101018] rounded-full p-0.5 border border-white/10">
-                    <button
-                      onClick={() => updateCartQty(item.product_id, -1)}
-                      className="w-4 h-4 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-[10px] transition-colors"
-                      type="button"
-                    >
-                      -
-                    </button>
-                    <span className="text-[11px] font-bold text-white px-1.5 font-mono">
-                      {item.quantity}
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-xs text-slate-800 truncate">{item.name}</h4>
+                  <div className="flex items-center justify-between mt-1 text-xs">
+                    <span className="text-slate-500 font-mono">
+                      ฿{item.unit_price.toFixed(2)} / ชิ้น
                     </span>
-                    <button
-                      onClick={() => updateCartQty(item.product_id, 1)}
-                      className="w-4 h-4 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-[10px] transition-colors"
-                      type="button"
-                    >
-                      +
-                    </button>
+                    <span className="font-bold text-emerald-600 font-mono">
+                      ฿{item.subtotal.toFixed(2)}
+                    </span>
                   </div>
 
-                  <span className="font-bold text-white font-mono min-w-[50px] text-right text-[11px]">
-                    ฿{item.subtotal.toFixed(2)}
-                  </span>
+                  <div className="flex items-center justify-between mt-1.5">
+                    <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-1.5 py-0.5">
+                      <button
+                        onClick={() => updateCartQty(item.product_id, -1)}
+                        className="text-slate-500 hover:text-slate-800 p-0.5 transition-colors"
+                        type="button"
+                      >
+                        <MinusCircle className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-6 text-center text-xs font-semibold font-mono">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateCartQty(item.product_id, 1)}
+                        className="text-slate-500 hover:text-slate-800 p-0.5 transition-colors"
+                        type="button"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => removeFromCart(item.product_id)}
+                      className="text-slate-400 hover:text-rose-500 p-1 transition-colors"
+                      type="button"
+                      title="ลบรายการนี้"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
           )}
         </div>
 
-        {/* Price Calculation & Accounting Summary Box (Anchored at Bottom) */}
-        <div className="shrink-0 bg-[#202030] rounded-xl p-3 shadow-lg border border-white/10 flex flex-col gap-2.5 relative z-10">
-          {/* Header & Accounting Info */}
-          <div className="flex items-center justify-between text-xs pb-1 border-b border-white/10">
-            <span className="font-bold text-white flex items-center gap-1.5">
-              <Calculator className="w-3.5 h-3.5 text-primary-fixed" />
-              <span>คำนวณราคาสินค้า &amp; บัญชีต้นทุน</span>
-            </span>
-            <span className="text-[10px] text-inverse-on-surface/60 font-mono">
-              {totalItems} ชิ้นในตะกร้า
-            </span>
-          </div>
-
-          {/* Cost & Tax Breakdown */}
-          <div className="flex flex-col gap-1 p-2 bg-white/5 rounded-lg text-[11px] border border-white/5 font-sans">
-            <div className="flex justify-between text-inverse-on-surface/70">
-              <span>ยอดรวมก่อนภาษี (Pre-VAT):</span>
-              <span className="font-mono text-white">฿{preVatAmount.toFixed(2)}</span>
+        {/* Bottom Checkout & Accounting Section */}
+        <div className="p-4 border-t border-slate-200 bg-slate-50/70 space-y-3 shrink-0">
+          {/* Price & Tax Breakdown */}
+          <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs space-y-1 text-slate-600">
+            <div className="flex justify-between">
+              <span>จำนวนชิ้น:</span>
+              <span className="font-semibold text-slate-800 font-mono">{totalItems} ชิ้น</span>
             </div>
-            <div className="flex justify-between text-inverse-on-surface/70">
+            <div className="flex justify-between text-[11px] text-slate-500">
+              <span>ก่อนภาษี (Pre-VAT):</span>
+              <span className="font-mono">฿{preVatAmount.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-[11px] text-slate-500">
               <span>ภาษีขาย VAT 7% (ภ.พ.30):</span>
-              <span className="font-mono text-white">฿{vatAmount.toFixed(2)}</span>
+              <span className="font-mono">฿{vatAmount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-inverse-on-surface/70">
-              <span>ต้นทุนสินค้ารวม (FIFO Cost):</span>
-              <span className="font-mono text-white/90">฿{totalCogs.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-primary-fixed font-bold pt-1 border-t border-white/10">
-              <span>กำไรขั้นต้นบัญชี (Order GP):</span>
+            <div className="flex justify-between text-[11px] text-emerald-700 font-medium pt-0.5 border-t border-slate-100">
+              <span>กำไรขั้นต้น (Order GP):</span>
               <span className="font-mono">+฿{grossProfit.toFixed(2)} ({gpPercent}%)</span>
             </div>
+
+            <div className="flex justify-between items-baseline pt-1.5 border-t border-slate-200">
+              <span className="font-bold text-slate-900 text-sm">ยอดสุทธิ:</span>
+              <span className="text-emerald-600 text-2xl font-bold font-mono">
+                ฿{totalAmount.toFixed(2)}
+              </span>
+            </div>
           </div>
 
-          {/* Net Total Banner */}
-          <div className="flex items-center justify-between px-1 py-0.5">
-            <span className="text-xs font-bold text-inverse-on-surface">
-              ยอดรวมสุทธิ (Net Total)
-            </span>
-            <span className="text-2xl font-extrabold text-white tracking-tight font-mono">
-              ฿{totalAmount.toFixed(2)}
-            </span>
-          </div>
-
-          {/* Change Due Calculator */}
-          <div className="flex flex-col gap-1.5 pt-1 border-t border-white/10">
+          {/* Cash Tender & Change Due Calculator */}
+          <div className="p-2.5 bg-white rounded-xl border border-slate-200 space-y-2 text-xs">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-inverse-on-surface/70 shrink-0">รับเงินมา:</span>
+              <span className="text-slate-600 font-medium shrink-0">รับเงินมา:</span>
               <input
                 type="number"
                 value={cashReceived}
                 onChange={(e) => setCashReceived(e.target.value)}
                 placeholder={totalAmount > 0 ? totalAmount.toFixed(2) : "0.00"}
-                className="w-full px-2.5 py-1 bg-[#12121b] border border-white/20 rounded-md text-white font-mono text-xs font-bold focus:outline-none focus:border-primary-container"
+                className="w-full px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 text-right"
               />
             </div>
 
@@ -431,46 +388,38 @@ export default function CashierTab({
                   key={opt}
                   type="button"
                   onClick={() => setCashReceived(opt.toString())}
-                  className="py-1 rounded bg-white/5 hover:bg-white/15 text-white text-[10px] font-semibold transition-all active:scale-95 border border-white/5 font-mono"
+                  className="py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all font-mono border border-slate-200"
                 >
-                  {opt === totalAmount ? `พอดี ฿${opt.toFixed(0)}` : `฿${opt.toLocaleString('th-TH')}`}
+                  {opt === totalAmount ? `พอดี` : `฿${opt.toLocaleString('th-TH')}`}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center justify-between px-2.5 py-1 bg-[#12121b] rounded-md border border-white/10 text-xs">
-              <span className="text-[11px] text-inverse-on-surface/70">เงินทอน (Change Due):</span>
-              <span className="font-bold text-primary-fixed font-mono text-sm">
+            <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+              <span className="text-slate-600 font-medium">เงินทอน (Change Due):</span>
+              <span className="font-bold text-emerald-600 font-mono text-base">
                 ฿{changeDue.toFixed(2)}
               </span>
             </div>
           </div>
 
-          {/* F10 Finalize Button */}
+          {/* Finalize Button (Exact Green Style with F10) */}
           <button
-            onClick={onCheckout}
             disabled={cart.length === 0}
+            onClick={onCheckout}
             type="button"
-            className="w-full py-2.5 rounded-full bg-primary-container hover:bg-primary disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 mt-0.5"
+            className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
+              cart.length > 0
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer shadow-emerald-600/20 active:scale-98'
+                : 'bg-slate-300 text-slate-400 cursor-not-allowed'
+            }`}
           >
-            <Receipt className="w-4 h-4" />
-            <span>คิดเงิน &amp; บันทึกบัญชี</span>
-            <kbd className="px-1.5 py-0.5 bg-white/20 text-white rounded text-[10px] font-mono">
+            <DollarSign className="w-4 h-4" />
+            <span>ชำระเงิน (฿{totalAmount.toFixed(2)})</span>
+            <kbd className="px-1.5 py-0.5 bg-black/20 text-white rounded text-[10px] font-mono ml-1">
               F10
             </kbd>
           </button>
-
-          {/* Security & Ledger Badges */}
-          <div className="flex items-center justify-between text-[10px] text-inverse-on-surface/50 pt-0.5 px-1">
-            <div className="flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-primary-fixed" />
-              <span>ลงบัญชีรายได้ทันที</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Lock className="w-3 h-3" />
-              <span>ตัดสต็อก FIFO อัตโนมัติ</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
