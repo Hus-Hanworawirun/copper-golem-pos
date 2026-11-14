@@ -24,23 +24,11 @@ export default function Sidebar({
   return (
     <aside className="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 border-r border-slate-800 select-none">
       {/* Brand Header */}
-      <div className="p-5 border-b border-slate-800 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-slate-800 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold overflow-hidden shadow-sm shrink-0">
-          <img
-            src="/logo.png"
-            alt="Copper Golem Logo"
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        </div>
-        <div className="min-w-0">
-          <h1 className="font-bold text-base text-white tracking-wide truncate">
-            Copper Golem POS
-          </h1>
-          <p className="text-xs text-amber-400/80 truncate">ระบบแคชเชียร์ &amp; คลังสต็อก</p>
-        </div>
+      <div className="p-5 border-b border-slate-800">
+        <h1 className="font-bold text-xl text-white tracking-wide truncate">
+          Pouch
+        </h1>
+        <p className="text-xs text-amber-400/80 truncate mt-0.5">ระบบแคชเชียร์ &amp; คลังสต็อก</p>
       </div>
 
       {/* Barcode listener indicator */}

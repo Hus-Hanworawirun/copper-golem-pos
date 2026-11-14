@@ -1,7 +1,7 @@
 {
   "name": "copper-golem-pos",
   "version": "1.0.0",
-  "description": "Copper Golem POS - Desktop Retail POS and Stock Accounting System",
+  "description": "Pouch - Micro ERP & Retail System",
   "main": "electron-main.js",
   "scripts": {
     "start": "node server/index.js",
@@ -16,7 +16,7 @@
   },
   "build": {
     "appId": "com.coppergolem.pos",
-    "productName": "Copper Golem POS",
+    "productName": "Pouch",
     "directories": {
       "output": "release"
     },
@@ -48,7 +48,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Copper Golem POS"
+      "shortcutName": "Pouch"
     },
     "publish": [
       {

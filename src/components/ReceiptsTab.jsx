@@ -329,16 +329,8 @@ export default function ReceiptsTab({
               <div className="bg-slate-50 text-slate-800 rounded-2xl p-5 border border-slate-200 flex flex-col font-mono text-xs shadow-inner">
                 {/* Header */}
                 <div className="text-center pb-3 border-b border-dashed border-slate-300">
-                  <div className="w-8 h-8 rounded-xl bg-slate-900 text-white mx-auto flex items-center justify-center font-bold mb-1 shadow-xs overflow-hidden">
-                    <img
-                      src="/logo.png"
-                      alt=""
-                      className="w-full h-full object-cover"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                    />
-                  </div>
-                  <div className="font-bold text-sm text-slate-900 font-sans">
-                    COPPER GOLEM POS
+                  <div className="font-bold text-base text-slate-900 font-sans tracking-wide">
+                    POUCH
                   </div>
                   <div className="text-[10px] text-slate-500 font-sans">
                     ระบบขายปลีกและบันทึกบัญชีสินค้า

@@ -57,7 +57,7 @@ function createWindow() {
     height: 800,
     minWidth: 1024,
     minHeight: 700,
-    title: 'Copper Golem POS',
+    title: 'Pouch',
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
