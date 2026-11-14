@@ -533,11 +533,11 @@ app.get('/api/reports/stock-logs', (req, res) => {
     const logs = db.prepare(`
       SELECT 
         l.id, l.change_qty, l.type, l.total_cost, l.unit_cost, l.note, l.created_at,
-        p.name as product_name, p.barcode
+        p.name as product_name, p.barcode, p.stock_qty as current_stock
       FROM stock_logs l
       LEFT JOIN products p ON l.product_id = p.id
       ORDER BY l.id DESC
-      LIMIT 100
+      LIMIT 200
     `).all();
     res.json(logs);
   } catch (err) {

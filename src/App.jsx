@@ -632,6 +632,7 @@ export default function App() {
             orderHistory={orderHistory}
             stockLogs={stockLogs}
             products={products}
+            expenses={expenses}
             reportTimeframe={reportTimeframe}
             setReportTimeframe={setReportTimeframe}
             onViewReceipt={(ord) => setSelectedReceiptOrder(ord)}
