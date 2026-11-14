@@ -50,12 +50,7 @@ export default function Sidebar({
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto scrollbar-none">
-        {/* Group 1: หน้าร้าน & คลัง */}
-        <div className="pt-1 pb-1 px-2 text-[10px] uppercase font-bold tracking-wider text-slate-500">
-          ระบบหน้าร้าน &amp; คลังสินค้า
-        </div>
-
+      <nav className="flex-1 px-3 py-2 space-y-1.5 overflow-y-auto scrollbar-none">
         {/* 1. ขายหน้าร้าน (Cashier) */}
         <button
           onClick={() => setActiveTab('pos')}
@@ -88,11 +83,6 @@ export default function Sidebar({
           <Boxes className="w-5 h-5 shrink-0" />
           <span className="truncate">คลังสินค้า &amp; ต้นทุน</span>
         </button>
-
-        {/* Group 2: รายงาน & บัญชี */}
-        <div className="pt-3 pb-1 px-2 text-[10px] uppercase font-bold tracking-wider text-slate-500">
-          บัญชี &amp; สรุปผลกำไร
-        </div>
 
         {/* 3. ภาพรวมกำไร-ขาดทุน */}
         <button
