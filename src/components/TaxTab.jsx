@@ -146,7 +146,7 @@ export default function TaxTab({
       </section>
 
       {/* VAT 1.8M Hero Telemetry Bar */}
-      <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+      <section className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
@@ -154,22 +154,19 @@ export default function TaxTab({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-slate-900">
+                <span className="text-sm font-bold text-[#181A18]">
                   เพดานภาษีมูลค่าเพิ่ม 1.8 ล้านบาท (VAT Threshold)
                 </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[10px] text-emerald-700 font-bold border border-emerald-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live
-                </span>
               </div>
-              <span className="text-xs text-slate-500 block mt-0.5">
+              <span className="text-xs text-[#717672] block mt-0.5">
                 เกณฑ์ยื่นจดภาษีมูลค่าเพิ่ม (ภ.พ.01) เมื่อรายรับเกิน 1,800,000 บาท/ปี
               </span>
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs shrink-0">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F7F6F2] border border-[#EAE7E1] text-xs shrink-0">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span className="font-semibold text-slate-800">
+            <span className="font-semibold text-[#181A18]">
               {vatPct >= 100
                 ? 'เกินเกณฑ์ 1.8M แล้ว (ต้องจด VAT)'
                 : vatPct >= 80
