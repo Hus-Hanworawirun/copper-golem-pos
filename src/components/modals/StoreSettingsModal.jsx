@@ -85,23 +85,23 @@ export default function StoreSettingsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 select-none font-['Prompt',sans-serif] animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 select-none font-['Prompt',sans-serif] animate-fadeIn">
+      <div className="bg-white border border-[#EAE7E1] rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+        <div className="px-6 py-4 border-b border-[#EAE7E1] flex items-center justify-between bg-white">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#F7F6F2] border border-[#EAE7E1] flex items-center justify-center text-[#181A18]">
               <Store className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-white">ตั้งค่าข้อมูลร้านค้า &amp; แบรนด์</h3>
-              <p className="text-[11px] text-slate-400">กำหนดชื่อร้าน, โลโก้ และเลขผู้เสียภาษีสำหรับแสดงบนระบบและใบเสร็จ</p>
+              <h3 className="font-bold text-sm text-[#181A18]">ตั้งค่าข้อมูลร้านค้า &amp; แบรนด์</h3>
+              <p className="text-[11px] text-[#717672]">กำหนดชื่อร้าน, โลโก้ และเลขผู้เสียภาษีสำหรับแสดงบนระบบและใบเสร็จ</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+            className="text-[#717672] hover:text-[#181A18] hover:bg-[#F7F6F2] p-1.5 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -110,9 +110,9 @@ export default function StoreSettingsModal({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* 1. Logo Upload & Live Preview */}
-          <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-slate-800/60 rounded-xl border border-slate-700/60">
+          <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[#F7F6F2] rounded-2xl border border-[#EAE7E1]">
             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-emerald-500/60 bg-slate-900 shadow-md p-1 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-[#EAE7E1] bg-white shadow-2xs p-0.5 flex items-center justify-center group-hover:border-[#181A18] transition-colors">
                 <img
                   src={logoPreview}
                   alt="Store Logo Preview"
@@ -122,15 +122,15 @@ export default function StoreSettingsModal({
                   }}
                 />
               </div>
-              <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-[10px] transition-opacity">
-                <Camera className="w-5 h-5 mb-0.5" />
+              <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-[10px] transition-opacity">
+                <Camera className="w-4 h-4 mb-0.5" />
                 <span>เปลี่ยนรูป</span>
               </div>
             </div>
 
             <div className="flex-1 text-center sm:text-left">
-              <h4 className="font-semibold text-xs text-white">โลโก้ร้านค้า (Store Logo)</h4>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <h4 className="font-semibold text-xs text-[#181A18]">โลโก้ร้านค้า (Store Logo)</h4>
+              <p className="text-[11px] text-[#717672] mt-0.5">
                 รองรับไฟล์ PNG, JPG หรือ WebP (แนะนำรูปทรงสี่เหลี่ยมจัตุรัสหรือวงกลม)
               </p>
               <input
@@ -143,9 +143,9 @@ export default function StoreSettingsModal({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2.5 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs font-medium transition-colors inline-flex items-center gap-1.5 border border-slate-600/70 cursor-pointer"
+                className="mt-2.5 px-3.5 py-1.5 bg-white hover:bg-slate-50 text-[#181A18] rounded-xl text-xs font-medium transition-colors inline-flex items-center gap-1.5 border border-[#EAE7E1] shadow-2xs cursor-pointer"
               >
-                <Upload className="w-3.5 h-3.5 text-emerald-400" />
+                <Upload className="w-3.5 h-3.5 text-[#717672]" />
                 <span>อัปโหลดรูปภาพใหม่</span>
               </button>
             </div>
@@ -153,8 +153,8 @@ export default function StoreSettingsModal({
 
           {/* 2. Store Name */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+            <label className="text-xs font-semibold text-[#181A18] flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>ชื่อร้านค้า (Store Name) *</span>
             </label>
             <input
@@ -163,14 +163,14 @@ export default function StoreSettingsModal({
               value={form.store_name}
               onChange={(e) => setForm({ ...form, store_name: e.target.value })}
               placeholder="ระบุชื่อร้านค้าของคุณ (เช่น Pouch, ร้านสุขใจ)"
-              className="w-full px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-medium"
+              className="w-full px-3.5 py-2.5 bg-[#F7F6F2] border border-[#EAE7E1] rounded-xl text-xs text-[#181A18] placeholder:text-[#8C948E] focus:outline-none focus:ring-2 focus:ring-[#181A18]/20 focus:border-[#181A18] font-medium"
             />
           </div>
 
           {/* 3. Store Subtitle / Slogan */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <label className="text-xs font-semibold text-[#181A18] flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>คำบรรยาย / สโลแกนร้านค้า (Subtitle)</span>
             </label>
             <input
@@ -178,14 +178,14 @@ export default function StoreSettingsModal({
               value={form.store_subtitle}
               onChange={(e) => setForm({ ...form, store_subtitle: e.target.value })}
               placeholder="เช่น ระบบแคชเชียร์ & คลังสต็อก, มินิมาร์ทบริการ 24 ชม."
-              className="w-full px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full px-3.5 py-2.5 bg-[#F7F6F2] border border-[#EAE7E1] rounded-xl text-xs text-[#181A18] placeholder:text-[#8C948E] focus:outline-none focus:ring-2 focus:ring-[#181A18]/20 focus:border-[#181A18]"
             />
           </div>
 
           {/* 4. Tax ID (เลขประจำตัวผู้เสียภาษี) */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-amber-400" />
+            <label className="text-xs font-semibold text-[#181A18] flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-amber-500" />
               <span>เลขประจำตัวผู้เสียภาษี 13 หลัก (Tax ID สำหรับใบเสร็จ)</span>
             </label>
             <input
@@ -194,20 +194,20 @@ export default function StoreSettingsModal({
               value={form.tax_id}
               onChange={(e) => setForm({ ...form, tax_id: e.target.value })}
               placeholder="เช่น 0105566012345 หรือเลขบัตรประชาชน 13 หลัก"
-              className="w-full px-3.5 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-mono"
+              className="w-full px-3.5 py-2.5 bg-[#F7F6F2] border border-[#EAE7E1] rounded-xl text-xs text-[#181A18] placeholder:text-[#8C948E] focus:outline-none focus:ring-2 focus:ring-[#181A18]/20 focus:border-[#181A18] font-mono"
             />
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-[#717672]">
               ข้อมูลนี้จะถูกนำไปพิมพ์ลงบนสลิปใบเสร็จและใบกำกับภาษีอย่างย่อ (ABB)
             </p>
           </div>
 
           {/* Action Footer */}
-          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-800">
+          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-[#EAE7E1]">
             <button
               type="button"
               onClick={onClose}
               disabled={isSaving}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-colors cursor-pointer"
+              className="px-4 py-2 bg-white hover:bg-[#F7F6F2] text-[#717672] hover:text-[#181A18] rounded-xl text-xs font-medium transition-colors border border-[#EAE7E1] cursor-pointer"
             >
               ยกเลิก
             </button>
@@ -215,11 +215,11 @@ export default function StoreSettingsModal({
             <button
               type="submit"
               disabled={isSaving}
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-900/40 flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+              className="px-5 py-2 bg-[#181A18] hover:bg-[#2C302D] text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
             >
               {successToast ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-white" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <span>บันทึกสำเร็จ!</span>
                 </>
               ) : (
