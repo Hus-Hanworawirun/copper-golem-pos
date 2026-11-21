@@ -62,14 +62,8 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Barcode listener indicator */}
-      <div className="mx-3.5 my-3 px-3 py-2 bg-[#1A1F1B] rounded-xl flex items-center gap-2 border border-[#232824]">
-        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span className="text-xs text-[#A6ADA8] font-medium">พร้อมยิงบาร์โค้ด USB (F2)</span>
-      </div>
-
       {/* Navigation Menu */}
-      <nav className="flex-1 px-3 py-1.5 space-y-1 overflow-y-auto scrollbar-none">
+      <nav className="flex-1 px-3 pt-3 pb-1.5 space-y-1 overflow-y-auto scrollbar-none">
         {/* 1. ขายหน้าร้าน (Cashier) */}
         <button
           onClick={() => setActiveTab('pos')}

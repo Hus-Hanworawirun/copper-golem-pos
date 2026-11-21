@@ -101,7 +101,7 @@ export default function CashierTab({
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header & Search Area */}
         <div className="p-6 pb-2 space-y-4 shrink-0">
-          {/* Top Banner: Date, Title & Store Register Card */}
+          {/* Top Banner: Date, Title & Action */}
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-[11px] font-semibold tracking-wider text-[#717672] uppercase">
@@ -112,31 +112,17 @@ export default function CashierTab({
               </h1>
             </div>
 
-            {/* Store & Register Card Badge */}
-            <div className="flex items-center gap-2.5">
-              <div className="bg-white border border-[#EAE7E1] rounded-2xl px-4 py-2 flex items-center gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <div className="text-left">
-                  <div className="text-xs font-bold text-[#181A18] leading-tight">
-                    {storeSettings?.store_name || 'Pouch'}
-                  </div>
-                  <div className="text-[10px] text-[#717672]">
-                    จุดขาย 01 · พร้อมใช้งาน
-                  </div>
-                </div>
-              </div>
-
-              {onOpenAddProduct && (
-                <button
-                  type="button"
-                  onClick={onOpenAddProduct}
-                  className="bg-white hover:bg-slate-50 border border-[#EAE7E1] text-[#181A18] rounded-2xl p-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-colors cursor-pointer"
-                  title="เพิ่มสินค้าใหม่"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+            {onOpenAddProduct && (
+              <button
+                type="button"
+                onClick={onOpenAddProduct}
+                className="bg-white hover:bg-slate-50 border border-[#EAE7E1] text-[#181A18] rounded-2xl px-3.5 py-2 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+                title="เพิ่มสินค้าใหม่"
+              >
+                <Plus className="w-4 h-4 text-[#717672]" />
+                <span>เพิ่มสินค้าใหม่</span>
+              </button>
+            )}
           </div>
 
           {/* Search Bar matching the mock-up */}
