@@ -79,37 +79,10 @@ ipcMain.handle('get-app-version', () => {
 
 ipcMain.handle('check-for-updates', async () => {
   if (!app.isPackaged) {
-    // In Dev Mode: Simulate update flow for testing UI and progress bar
-    sendUpdateStatus('checking');
-    setTimeout(() => {
-      sendUpdateStatus('available', {
-        version: '1.0.2 (Dev Demo)',
-        releaseNotes: 'ทดสอบระบบอัปเดตอัตโนมัติในโหมดจำลอง Development'
-      });
-
-      let pct = 0;
-      const interval = setInterval(() => {
-        pct += 25;
-        if (pct <= 100) {
-          sendUpdateStatus('downloading', {
-            percent: pct,
-            speed: 1024 * 1024 * 3.2,
-            transferred: pct * 450000,
-            total: 45000000
-          });
-        }
-        if (pct >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            sendUpdateStatus('downloaded', {
-              version: '1.0.2 (Dev Demo)'
-            });
-          }, 300);
-        }
-      }, 400);
-    }, 1000);
-
-    return { status: 'dev-mode-simulated' };
+    sendUpdateStatus('not-available', {
+      message: 'ระบบกำลังทำงานในโหมด Development (ยังไม่ได้แพ็กไฟล์ .exe) การอัปเดตอัตโนมัติจะทำงานในตัวติดตั้ง Production'
+    });
+    return { status: 'dev-mode' };
   }
 
   try {
@@ -124,13 +97,6 @@ ipcMain.handle('check-for-updates', async () => {
 ipcMain.handle('restart-and-install', () => {
   if (app.isPackaged) {
     autoUpdater.quitAndInstall();
-  } else {
-    dialog.showMessageBox({
-      type: 'info',
-      title: 'โหมดจำลอง (Dev Mode)',
-      message: 'จำลองการรีสตาร์ตและติดตั้งเวอร์ชันใหม่เสร็จสมบูรณ์',
-      detail: 'ในไฟล์ติดตั้งจริง (.exe) โปรแกรมจะปิดและเริ่มใหม่เพื่ออัปเดตเป็นเวอร์ชันล่าสุดทันที'
-    });
   }
 });
 

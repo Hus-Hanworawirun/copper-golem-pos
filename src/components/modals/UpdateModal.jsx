@@ -22,7 +22,7 @@ export default function UpdateModal({
   const {
     status = 'idle', // 'idle' | 'checking' | 'available' | 'downloading' | 'downloaded' | 'not-available' | 'error'
     version = '',
-    currentVersion = '1.0.1',
+    currentVersion = '1.1.0',
     percent = 0,
     speed = 0,
     transferred = 0,
@@ -151,16 +151,20 @@ export default function UpdateModal({
             </div>
           )}
 
-          {/* Status 5: Not Available (Up to date) */}
+          {/* Status 5: Not Available (Up to date or Notice) */}
           {status === 'not-available' && (
             <div className="py-3 space-y-3">
               <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200/60 flex items-center justify-center mx-auto text-emerald-700">
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-semibold text-sm text-[#181A18]">โปรแกรมเป็นเวอร์ชันล่าสุดแล้ว</h4>
-                <p className="text-xs text-[#717672] mt-1">
-                  ปัจจุบันใช้งานเวอร์ชัน <span className="font-mono text-[#181A18] font-bold">v{currentVersion}</span> ไม่พบรายการอัปเดตใหม่
+                <h4 className="font-semibold text-sm text-[#181A18]">
+                  {message ? 'ระบบอัปเดตโปรแกรม' : 'โปรแกรมเป็นเวอร์ชันล่าสุดแล้ว'}
+                </h4>
+                <p className="text-xs text-[#717672] mt-1 max-w-xs mx-auto">
+                  {message || (
+                    <>ปัจจุบันใช้งานเวอร์ชัน <span className="font-mono text-[#181A18] font-bold">v{currentVersion}</span> ไม่พบรายการอัปเดตใหม่</>
+                  )}
                 </p>
               </div>
               <div className="pt-2">

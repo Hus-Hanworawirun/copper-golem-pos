@@ -20,12 +20,12 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   // App Version & Auto-Updater State
-  const [appVersion, setAppVersion] = useState('1.0.1');
+  const [appVersion, setAppVersion] = useState('1.1.0');
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [updateState, setUpdateState] = useState({
     status: 'idle',
     version: '',
-    currentVersion: '1.0.1',
+    currentVersion: '1.1.0',
     percent: 0,
     speed: 0,
     transferred: 0,
@@ -252,47 +252,20 @@ export default function App() {
         }));
       }
     } else {
-      // Mock Demo mode when in browser without Electron
+      // Running in web browser without Electron
       setTimeout(() => {
         setUpdateState((prev) => ({
           ...prev,
-          status: 'available',
-          version: '1.0.2 (Web Demo)'
+          status: 'not-available',
+          message: 'ระบบอัปเดตอัตโนมัติรองรับเฉพาะการใช้งานผ่านโปรแกรม Desktop App (Pouch.exe)'
         }));
-        let pct = 0;
-        const timer = setInterval(() => {
-          pct += 25;
-          if (pct <= 100) {
-            setUpdateState((prev) => ({
-              ...prev,
-              status: 'downloading',
-              percent: pct,
-              speed: 1024 * 1024 * 3.5,
-              transferred: pct * 450000,
-              total: 45000000
-            }));
-          }
-          if (pct >= 100) {
-            clearInterval(timer);
-            setTimeout(() => {
-              setUpdateState((prev) => ({
-                ...prev,
-                status: 'downloaded',
-                version: '1.0.2 (Web Demo)'
-              }));
-            }, 300);
-          }
-        }, 400);
-      }, 1000);
+      }, 400);
     }
   };
 
   const handleRestartAndInstall = () => {
     if (window.electronAPI) {
       window.electronAPI.restartAndInstall();
-    } else {
-      alert('จำลองการรีสตาร์ตและติดตั้งเสร็จสมบูรณ์ (Web Demo)');
-      setIsUpdateModalOpen(false);
     }
   };
 
