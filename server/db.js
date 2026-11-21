@@ -93,6 +93,18 @@ db.exec(`
     note TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS store_settings (
+    id INTEGER PRIMARY KEY DEFAULT 1,
+    store_name TEXT DEFAULT 'Pouch',
+    store_subtitle TEXT DEFAULT 'ระบบแคชเชียร์ & คลังสต็อก',
+    tax_id TEXT DEFAULT '0105566012345',
+    logo_url TEXT DEFAULT '/logo.png',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  INSERT OR IGNORE INTO store_settings (id, store_name, store_subtitle, tax_id, logo_url)
+  VALUES (1, 'Pouch', 'ระบบแคชเชียร์ & คลังสต็อก', '0105566012345', '/logo.png');
 `);
 
 module.exports = db;

@@ -11,7 +11,8 @@ import {
   RotateCcw,
   ShieldCheck,
   ArrowUpCircle,
-  RotateCw
+  RotateCw,
+  Pencil
 } from 'lucide-react';
 
 export default function Sidebar({
@@ -24,24 +25,40 @@ export default function Sidebar({
   taxSummary = null,
   appVersion = '1.0.1',
   onCheckUpdate = () => {},
-  isCheckingUpdate = false
+  isCheckingUpdate = false,
+  storeSettings = null,
+  onOpenStoreSettings = () => {}
 }) {
   return (
     <aside className="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 border-r border-slate-800 select-none">
       {/* Brand Header */}
-      <div className="p-4 border-b border-slate-800 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 shadow-md border border-slate-700/60 bg-slate-800 p-0.5">
+      <div
+        onClick={onOpenStoreSettings}
+        className="p-4 border-b border-slate-800 flex items-center gap-3 hover:bg-slate-800/60 transition-colors cursor-pointer group"
+        title="คลิกเพื่อตั้งค่าชื่อร้านและโลโก้"
+      >
+        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 shadow-md border border-slate-700/60 bg-slate-800 p-0.5 group-hover:border-emerald-500/60 transition-colors">
           <img
-            src="/logo.png"
-            alt="Pouch Logo"
+            src={storeSettings?.logo_url || '/logo.png'}
+            alt="Store Logo"
             className="w-full h-full object-cover rounded-full"
+            onError={(e) => {
+              e.currentTarget.src = '/logo.png';
+            }}
           />
         </div>
-        <div className="min-w-0">
-          <h1 className="font-bold text-lg text-white tracking-wide truncate">
-            Pouch
-          </h1>
-          <p className="text-xs text-amber-400/80 truncate">ระบบแคชเชียร์ &amp; คลังสต็อก</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-1">
+            <h1 className="font-bold text-lg text-white tracking-wide truncate group-hover:text-emerald-400 transition-colors">
+              {storeSettings?.store_name || 'Pouch'}
+            </h1>
+            <span className="opacity-0 group-hover:opacity-100 text-slate-400 group-hover:text-emerald-400 transition-opacity p-0.5">
+              <Pencil className="w-3.5 h-3.5" />
+            </span>
+          </div>
+          <p className="text-xs text-amber-400/80 truncate">
+            {storeSettings?.store_subtitle || 'ระบบแคชเชียร์ & คลังสต็อก'}
+          </p>
         </div>
       </div>
 

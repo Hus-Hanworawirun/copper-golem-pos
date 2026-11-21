@@ -10,6 +10,7 @@ import RestockModal from './components/modals/RestockModal';
 import BarcodeModal from './components/modals/BarcodeModal';
 import ReceiptModal from './components/modals/ReceiptModal';
 import UpdateModal from './components/modals/UpdateModal';
+import StoreSettingsModal from './components/modals/StoreSettingsModal';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('pos'); // 'pos', 'inventory', 'accounting', 'receipts', 'tax'
@@ -85,6 +86,15 @@ export default function App() {
   const [taxPeriod, setTaxPeriod] = useState('all'); // 'all', 'h1', 'h2'
   const [expenses, setExpenses] = useState([]);
 
+  // Store Customization Settings State
+  const [storeSettings, setStoreSettings] = useState({
+    store_name: 'Pouch',
+    store_subtitle: 'ระบบแคชเชียร์ & คลังสต็อก',
+    tax_id: '0105566012345',
+    logo_url: '/logo.png'
+  });
+  const [isStoreSettingsOpen, setIsStoreSettingsOpen] = useState(false);
+
   // Audio feedback for scanner
   const playBeep = () => {
     try {
@@ -155,11 +165,41 @@ export default function App() {
     }
   };
 
+  // Fetch Store Settings
+  const fetchStoreSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      if (res.ok) {
+        const data = await res.json();
+        setStoreSettings(data);
+      }
+    } catch (err) {
+      console.error('Fetch store settings error:', err);
+    }
+  };
+
+  // Handle Save Store Settings
+  const handleSaveStoreSettings = async (formData) => {
+    const res = await fetch('/api/settings', {
+      method: 'PUT',
+      body: formData
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'บันทึกข้อมูลไม่สำเร็จ');
+    }
+    const data = await res.json();
+    if (data?.settings) {
+      setStoreSettings(data.settings);
+    }
+  };
+
   // Initial load
   useEffect(() => {
     fetchProducts();
     fetchAccountingData();
     fetchTaxData();
+    fetchStoreSettings();
   }, []);
 
   // Electron Auto-Updater Lifecycle
@@ -728,6 +768,8 @@ export default function App() {
         appVersion={appVersion}
         onCheckUpdate={handleCheckForUpdates}
         isCheckingUpdate={updateState.status === 'checking'}
+        storeSettings={storeSettings}
+        onOpenStoreSettings={() => setIsStoreSettingsOpen(true)}
       />
 
       {/* 2. RIGHT MAIN CONTENT COLUMN */}
@@ -781,6 +823,7 @@ export default function App() {
             <ReceiptsTab
               orderHistory={orderHistory}
               onPrintThermal={(ord) => setSelectedReceiptOrder(ord)}
+              storeSettings={storeSettings}
             />
           )}
 
@@ -840,6 +883,7 @@ export default function App() {
           setCompletedOrder(null);
           setSelectedReceiptOrder(null);
         }}
+        storeSettings={storeSettings}
       />
 
       <UpdateModal
@@ -848,6 +892,13 @@ export default function App() {
         updateState={updateState}
         onRestart={handleRestartAndInstall}
         onCheckAgain={handleCheckForUpdates}
+      />
+
+      <StoreSettingsModal
+        isOpen={isStoreSettingsOpen}
+        onClose={() => setIsStoreSettingsOpen(false)}
+        settings={storeSettings}
+        onSaveSettings={handleSaveStoreSettings}
       />
     </div>
   );

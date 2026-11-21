@@ -14,7 +14,8 @@ import {
 
 export default function ReceiptsTab({
   orderHistory = [],
-  onPrintThermal
+  onPrintThermal,
+  storeSettings = null
 }) {
   const [search, setSearch] = useState('');
   const [dateFilter, setDateFilter] = useState('all'); // 'all', 'today', '7days'
@@ -331,20 +332,20 @@ export default function ReceiptsTab({
                 <div className="text-center pb-3 border-b border-dashed border-slate-300">
                   <div className="w-8 h-8 rounded-full mx-auto flex items-center justify-center mb-1 overflow-hidden shadow-xs border border-slate-200 bg-white p-0.5">
                     <img
-                      src="/logo.png"
-                      alt="Pouch Logo"
+                      src={storeSettings?.logo_url || '/logo.png'}
+                      alt="Store Logo"
                       className="w-full h-full object-cover rounded-full"
                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
-                  <div className="font-bold text-base text-slate-900 font-sans tracking-wide">
-                    POUCH
+                  <div className="font-bold text-base text-slate-900 font-sans tracking-wide uppercase">
+                    {storeSettings?.store_name || 'POUCH'}
                   </div>
                   <div className="text-[10px] text-slate-500 font-sans">
-                    ระบบขายปลีกและบันทึกบัญชีสินค้า
+                    {storeSettings?.store_subtitle || 'ระบบขายปลีกและบันทึกบัญชีสินค้า'}
                   </div>
                   <div className="text-[10px] text-slate-500 font-sans">
-                    เลขประจำตัวผู้เสียภาษี: 0105566012345
+                    เลขประจำตัวผู้เสียภาษี: {storeSettings?.tax_id || '0105566012345'}
                   </div>
                   <div className="mt-2 inline-block px-2.5 py-0.5 rounded-full bg-slate-200/80 text-slate-800 font-sans text-[11px] font-bold">
                     ใบกำกับภาษีอย่างย่อ (ABB)

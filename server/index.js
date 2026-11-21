@@ -839,6 +839,49 @@ app.post('/api/system/seed', (req, res) => {
   }
 });
 
+// ---------------- STORE SETTINGS API ----------------
+app.get('/api/settings', (req, res) => {
+  try {
+    const settings = db.prepare('SELECT * FROM store_settings WHERE id = 1').get();
+    res.json(settings || {
+      store_name: 'Pouch',
+      store_subtitle: 'ระบบแคชเชียร์ & คลังสต็อก',
+      tax_id: '0105566012345',
+      logo_url: '/logo.png'
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/settings', upload.single('logo'), (req, res) => {
+  try {
+    const { store_name, store_subtitle, tax_id } = req.body;
+    const existing = db.prepare('SELECT * FROM store_settings WHERE id = 1').get();
+
+    const logoUrl = req.file ? `/uploads/${req.file.filename}` : (existing ? existing.logo_url : '/logo.png');
+    const name = (store_name !== undefined && store_name.trim()) ? store_name.trim() : (existing?.store_name || 'Pouch');
+    const subtitle = store_subtitle !== undefined ? store_subtitle.trim() : (existing?.store_subtitle || 'ระบบแคชเชียร์ & คลังสต็อก');
+    const tax = tax_id !== undefined ? tax_id.trim() : (existing?.tax_id || '0105566012345');
+
+    db.prepare(`
+      INSERT INTO store_settings (id, store_name, store_subtitle, tax_id, logo_url, updated_at)
+      VALUES (1, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(id) DO UPDATE SET
+        store_name = excluded.store_name,
+        store_subtitle = excluded.store_subtitle,
+        tax_id = excluded.tax_id,
+        logo_url = excluded.logo_url,
+        updated_at = CURRENT_TIMESTAMP
+    `).run(name, subtitle, tax, logoUrl);
+
+    const updated = db.prepare('SELECT * FROM store_settings WHERE id = 1').get();
+    res.json({ success: true, settings: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Serve frontend build if available
 const distPath = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(distPath)) {
