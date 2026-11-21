@@ -10,7 +10,8 @@ import {
   PlusCircle,
   Save,
   Trash2,
-  ThumbsUp
+  ThumbsUp,
+  Calendar
 } from 'lucide-react';
 
 export default function TaxTab({
@@ -80,19 +81,40 @@ export default function TaxTab({
   const vatPct = Math.min(100, Math.max(0, (revenue / vatThreshold) * 100));
   const vatRemaining = Math.max(0, vatThreshold - revenue);
 
+  // Available Tax Years
+  const currentYear = new Date().getFullYear();
+  const defaultYears = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3];
+  const backendYears = taxSummary?.available_years || [];
+  const availableYears = Array.from(new Set([...defaultYears, ...backendYears, taxYear])).sort((a, b) => b - a);
+
   return (
     <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif]">
       {/* Header */}
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
+          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1 flex-wrap">
             <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-700 font-bold uppercase tracking-wider text-[10px]">
               ม.40(8) สรรพากร
             </span>
             <span>•</span>
-            <span className="font-medium">
-              ปีภาษี {taxYear + 543} (Tax Year {taxYear})
-            </span>
+            <div className="flex items-center gap-1.5 bg-white border border-slate-200 shadow-2xs rounded-lg px-2.5 py-1">
+              <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+              <label htmlFor="tax-year-select" className="text-slate-600 font-medium text-xs">
+                รอบปีภาษี:
+              </label>
+              <select
+                id="tax-year-select"
+                value={taxYear}
+                onChange={(e) => setTaxYear(Number(e.target.value))}
+                className="bg-transparent font-bold text-slate-900 text-xs focus:outline-none cursor-pointer pr-1"
+              >
+                {availableYears.map((yr) => (
+                  <option key={yr} value={yr}>
+                    พ.ศ. {yr + 543} ({yr}) {yr === currentYear ? '• ปีปัจจุบัน' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <h1 className="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">
             ภาษีเงินได้บุคคลธรรมดาพาณิชยกรรม ม.40(8)

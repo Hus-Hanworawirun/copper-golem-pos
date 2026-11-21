@@ -733,23 +733,23 @@ app.get('/api/tax/cash-flow', (req, res) => {
 // GET Thai Tax Summary & Filing Estimator (ภ.ง.ด. 90/94 & VAT Tracker)
 app.get('/api/tax/summary', (req, res) => {
   try {
-    const currentYear = new Date().getFullYear();
+    const targetYear = req.query.year ? parseInt(req.query.year, 10) : new Date().getFullYear();
 
-    // 1. Total Sales Income for current year
+    // 1. Total Sales Income for target year
     const salesStat = db.prepare(`
       SELECT 
         COALESCE(SUM(total_amount), 0) as total_revenue,
         COALESCE(SUM(total_cost), 0) as cogs_sold
       FROM orders
       WHERE strftime('%Y', created_at, 'localtime') = ?
-    `).get(currentYear.toString());
+    `).get(targetYear.toString());
 
-    // 2. Operational Expenses for current year
+    // 2. Operational Expenses for target year
     const expStat = db.prepare(`
       SELECT COALESCE(SUM(amount), 0) as total_expenses
       FROM expenses
       WHERE strftime('%Y', expense_date) = ?
-    `).get(currentYear.toString());
+    `).get(targetYear.toString());
 
     const totalRevenue = salesStat.total_revenue;
     const cogsSold = salesStat.cogs_sold;
@@ -773,8 +773,16 @@ app.get('/api/tax/summary', (req, res) => {
     const vatProgress = Number(((totalRevenue / vatThreshold) * 100).toFixed(1));
     const isVatRequired = totalRevenue >= vatThreshold;
 
+    // Discover available tax years
+    const orderYears = db.prepare(`SELECT DISTINCT strftime('%Y', created_at, 'localtime') as yr FROM orders WHERE created_at IS NOT NULL`).all().map(r => parseInt(r.yr, 10)).filter(Boolean);
+    const expenseYears = db.prepare(`SELECT DISTINCT strftime('%Y', expense_date) as yr FROM expenses WHERE expense_date IS NOT NULL`).all().map(r => parseInt(r.yr, 10)).filter(Boolean);
+    const currYr = new Date().getFullYear();
+    const defaultYears = [currYr, currYr - 1, currYr - 2, currYr - 3];
+    const availableYears = Array.from(new Set([...defaultYears, ...orderYears, ...expenseYears])).sort((a, b) => b - a);
+
     res.json({
-      tax_year: currentYear,
+      tax_year: targetYear,
+      available_years: availableYears,
       total_revenue: totalRevenue,
       cogs_sold: cogsSold,
       operational_expenses: totalExpenses,
