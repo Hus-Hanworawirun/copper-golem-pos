@@ -88,25 +88,25 @@ export default function TaxTab({
   const availableYears = Array.from(new Set([...defaultYears, ...backendYears, taxYear])).sort((a, b) => b - a);
 
   return (
-    <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif]">
+    <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif] bg-[#F7F6F2] select-none">
       {/* Header */}
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1 flex-wrap">
-            <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-700 font-bold uppercase tracking-wider text-[10px]">
+          <div className="flex items-center gap-2 text-xs text-[#717672] mb-1 flex-wrap">
+            <span className="px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-800 font-bold uppercase tracking-wider text-[10px]">
               ม.40(8) สรรพากร
             </span>
             <span>•</span>
-            <div className="flex items-center gap-1.5 bg-white border border-slate-200 shadow-2xs rounded-lg px-2.5 py-1">
+            <div className="flex items-center gap-1.5 bg-white border border-[#EAE7E1] shadow-2xs rounded-xl px-3 py-1">
               <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-              <label htmlFor="tax-year-select" className="text-slate-600 font-medium text-xs">
+              <label htmlFor="tax-year-select" className="text-[#717672] font-medium text-xs">
                 รอบปีภาษี:
               </label>
               <select
                 id="tax-year-select"
                 value={taxYear}
                 onChange={(e) => setTaxYear(Number(e.target.value))}
-                className="bg-transparent font-bold text-slate-900 text-xs focus:outline-none cursor-pointer pr-1"
+                className="bg-transparent font-bold text-[#181A18] text-xs focus:outline-none cursor-pointer pr-1"
               >
                 {availableYears.map((yr) => (
                   <option key={yr} value={yr}>
@@ -116,10 +116,10 @@ export default function TaxTab({
               </select>
             </div>
           </div>
-          <h1 className="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-xl lg:text-2xl font-bold text-[#181A18] tracking-tight">
             ภาษีเงินได้บุคคลธรรมดาพาณิชยกรรม ม.40(8)
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[#717672] mt-1">
             ระบบตรวจวัดเพดาน VAT 1.8M และสมุดบัญชีเงินสดรับจ่าย ป.ส. 10 สอดคล้องตามประกาศกรมสรรพากร
           </p>
         </div>
@@ -127,16 +127,16 @@ export default function TaxTab({
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl shadow-sm border border-slate-200 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-[#F7F6F2] text-[#181A18] text-xs font-semibold rounded-xl shadow-2xs border border-[#EAE7E1] transition-all cursor-pointer"
             type="button"
           >
-            <Printer className="w-4 h-4 text-slate-500" />
+            <Printer className="w-4 h-4 text-[#717672]" />
             <span>พิมพ์ ป.ส. 10</span>
           </button>
 
           <button
             onClick={onExportCsv}
-            className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#181A18] hover:bg-[#2C302D] text-white text-xs font-semibold rounded-xl shadow-2xs transition-all cursor-pointer"
             type="button"
           >
             <FileDown className="w-4 h-4" />

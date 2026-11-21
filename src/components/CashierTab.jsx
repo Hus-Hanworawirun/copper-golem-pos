@@ -6,14 +6,13 @@ import {
   Plus,
   ShoppingBag,
   Trash2,
-  MinusCircle,
+  Minus,
   PlusCircle,
-  DollarSign,
   Receipt,
-  History,
-  Coins,
-  CheckCircle2,
-  Lock
+  ScanBarcode,
+  Sparkles,
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 
 export default function CashierTab({
@@ -32,9 +31,7 @@ export default function CashierTab({
   setCashReceived,
   onCheckout,
   onOpenAddProduct,
-  onViewLatestReceipt,
-  onGoToReceipts,
-  orderHistoryCount = 0
+  storeSettings = null
 }) {
   const searchInputRef = useRef(null);
 
@@ -69,9 +66,9 @@ export default function CashierTab({
         e.preventDefault();
         searchInputRef.current?.focus();
         searchInputRef.current?.select();
-      } else if (e.key === 'F10') {
-        e.preventDefault();
+      } else if (e.key === 'F10' || (e.code === 'Space' && e.target === document.body)) {
         if (cart.length > 0) {
+          e.preventDefault();
           onCheckout();
         }
       }
@@ -90,156 +87,178 @@ export default function CashierTab({
     return Array.from(set).sort((a, b) => a - b).slice(0, 4);
   };
 
+  // Thai Date formatting
+  const todayDateString = new Date().toLocaleDateString('th-TH', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
-    <div className="flex-1 flex overflow-hidden font-['Prompt',sans-serif]">
-      {/* LEFT: PRODUCTS BROWSER & SCANNER */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 border-r border-slate-200">
-        {/* Top Search & Category Filter Bar */}
-        <div className="p-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0">
-          <div className="relative flex-1 min-w-[220px]">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+    <div className="flex-1 flex overflow-hidden font-['Prompt',sans-serif] bg-[#F7F6F2] select-none">
+      {/* 1. LEFT MAIN AREA: CATALOG & BROWSER */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Header & Search Area */}
+        <div className="p-6 pb-2 space-y-4 shrink-0">
+          {/* Top Banner: Date, Title & Store Register Card */}
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-semibold tracking-wider text-[#717672] uppercase">
+                {todayDateString}
+              </p>
+              <h1 className="text-2xl font-bold text-[#181A18] tracking-tight mt-0.5">
+                ระบบขายหน้าร้าน (Point of sale)
+              </h1>
+            </div>
+
+            {/* Store & Register Card Badge */}
+            <div className="flex items-center gap-2.5">
+              <div className="bg-white border border-[#EAE7E1] rounded-2xl px-4 py-2 flex items-center gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <div className="text-left">
+                  <div className="text-xs font-bold text-[#181A18] leading-tight">
+                    {storeSettings?.store_name || 'Pouch'}
+                  </div>
+                  <div className="text-[10px] text-[#717672]">
+                    จุดขาย 01 · พร้อมใช้งาน
+                  </div>
+                </div>
+              </div>
+
+              {onOpenAddProduct && (
+                <button
+                  type="button"
+                  onClick={onOpenAddProduct}
+                  className="bg-white hover:bg-slate-50 border border-[#EAE7E1] text-[#181A18] rounded-2xl p-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-colors cursor-pointer"
+                  title="เพิ่มสินค้าใหม่"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Search Bar matching the mock-up */}
+          <div className="relative flex items-center">
+            <Search className="w-4 h-4 text-[#717672] absolute left-4 pointer-events-none" />
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="พิมพ์ชื่อสินค้า หรือยิงบาร์โค้ด... (กด F2)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-800 placeholder:text-slate-400 font-sans"
+              placeholder="ค้นหาสินค้า หรือ ยิงบาร์โค้ด..."
+              className="w-full bg-white border border-[#EAE7E1] rounded-2xl pl-11 pr-24 py-3 text-xs text-[#181A18] placeholder:text-[#8C948E] focus:outline-none focus:ring-2 focus:ring-[#181A18]/20 focus:border-[#181A18] transition-all shadow-[0_1px_3px_rgba(0,0,0,0.02)]"
             />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+            <div className="absolute right-3.5 flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-md bg-[#F7F6F2] border border-[#EAE7E1] text-[10px] font-mono text-[#717672] font-semibold">
+                F2
+              </span>
+              <ScanBarcode className="w-4 h-4 text-[#717672]" />
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Category Filter Pills matching the mock-up */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             <button
-              onClick={onViewLatestReceipt}
               type="button"
-              title="เปิดดูใบเสร็จของบิลล่าสุดทันที"
-              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200"
+              onClick={() => setSelectedCategory('all')}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer ${
+                selectedCategory === 'all'
+                  ? 'bg-[#181A18] text-white shadow-sm'
+                  : 'bg-white text-[#717672] border border-[#EAE7E1] hover:border-[#D5D2CB] hover:text-[#181A18]'
+              }`}
             >
-              <Receipt className="w-4 h-4 text-emerald-600" />
-              <span>บิลล่าสุด</span>
+              สินค้าทั้งหมด
             </button>
-
-            <button
-              onClick={onGoToReceipts}
-              type="button"
-              title="เปิดดูประวัติใบเสร็จและบิลย้อนหลังทั้งหมด"
-              className="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-blue-200"
-            >
-              <History className="w-4 h-4 text-blue-600" />
-              <span>ค้นหาบิลย้อนหลัง ({orderHistoryCount})</span>
-            </button>
+            {categories
+              .filter((c) => c !== 'all')
+              .map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer ${
+                    selectedCategory === cat
+                      ? 'bg-[#181A18] text-white shadow-sm'
+                      : 'bg-white text-[#717672] border border-[#EAE7E1] hover:border-[#D5D2CB] hover:text-[#181A18]'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
           </div>
 
-          {/* Category Pills */}
-          <div className="w-full flex items-center gap-1.5 overflow-x-auto pt-1 scrollbar-none">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200/60'
-                }`}
-              >
-                {cat === 'all' ? 'ทั้งหมด' : cat}
-              </button>
-            ))}
+          {/* Section Heading */}
+          <div className="flex items-center justify-between pt-1">
+            <h2 className="text-xs font-semibold text-[#181A18]">
+              {selectedCategory === 'all' ? 'สินค้าทั้งหมด' : selectedCategory}
+              <span className="ml-2 font-normal text-[#717672]">
+                {filteredProducts.length} รายการ
+              </span>
+            </h2>
           </div>
         </div>
 
-        {/* Product Grid Area */}
-        <div className="flex-1 overflow-y-auto p-4">
+        {/* Product Grid */}
+        <div className="flex-1 overflow-y-auto px-6 pb-6">
           {filteredProducts.length === 0 ? (
-            <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-slate-400 py-12">
-              <Package className="w-14 h-14 stroke-[1.5] mb-3 text-slate-300" />
-              <p className="text-base font-bold text-slate-700">ไม่พบสินค้าในระบบ</p>
-              <p className="text-xs text-slate-500 max-w-sm text-center mt-1 mb-4">
-                เริ่มต้นเพิ่มสินค้าของคุณ หรือคลิกปุ่มด้านล่างเพื่อเพิ่มสินค้าใหม่
-              </p>
-              <button
-                type="button"
-                onClick={onOpenAddProduct}
-                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm shadow-emerald-600/20"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>+ เพิ่มสินค้าใหม่</span>
-              </button>
+            <div className="h-64 flex flex-col items-center justify-center text-[#717672]">
+              <Package className="w-10 h-10 mb-2 stroke-[1.5] text-[#A6ADA8]" />
+              <p className="text-xs font-medium">ไม่พบสินค้าที่ตรงกับการค้นหา</p>
+              <p className="text-[11px] text-[#8C948E] mt-0.5">ลองเปลี่ยนคำค้นหาหรือเลือกหมวดหมู่อื่น</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredProducts.map((p) => {
                 const isOutOfStock = p.stock_qty <= 0;
-                const isLowStock = p.stock_qty <= p.min_stock && !isOutOfStock;
-
                 return (
                   <div
                     key={p.id}
                     onClick={() => !isOutOfStock && addToCart(p)}
-                    className={`bg-white rounded-2xl border transition-all duration-150 flex flex-col overflow-hidden text-left relative group ${
+                    className={`bg-white rounded-2xl p-2.5 border border-[#EAE7E1] shadow-[0_1px_3px_rgba(0,0,0,0.02)] transition-all flex flex-col group ${
                       isOutOfStock
-                        ? 'opacity-60 cursor-not-allowed border-slate-200 bg-slate-50'
-                        : 'cursor-pointer hover:shadow-md hover:border-emerald-400 hover:-translate-y-0.5 border-slate-200 shadow-xs'
+                        ? 'opacity-60 cursor-not-allowed'
+                        : 'hover:shadow-md hover:border-[#D5D2CB] hover:-translate-y-0.5 cursor-pointer'
                     }`}
                   >
-                    {/* Image / Icon container */}
-                    <div className="h-32 w-full bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                    {/* Product Image */}
+                    <div className="w-full aspect-4/3 rounded-xl overflow-hidden bg-[#F2F0EA] relative flex items-center justify-center">
                       {p.image_url ? (
                         <img
                           src={p.image_url}
                           alt={p.name}
-                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="text-slate-300 flex flex-col items-center gap-1">
-                          <Package className="w-8 h-8" />
-                          <span className="text-[10px]">ไม่มีรูป</span>
-                        </div>
+                        <Package className="w-8 h-8 text-[#A6ADA8]" />
                       )}
 
-                      {/* Stock Pill Badge (Top Right) */}
-                      <span
-                        className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[11px] font-bold shadow-xs ${
-                          isOutOfStock
-                            ? 'bg-rose-500 text-white'
-                            : isLowStock
-                            ? 'bg-amber-500 text-white'
-                            : 'bg-slate-900/80 text-white backdrop-blur-xs'
-                        }`}
-                      >
-                        {isOutOfStock ? 'หมด' : `เหลือ ${p.stock_qty}`}
-                      </span>
+                      {isOutOfStock && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                          <span className="px-2.5 py-1 bg-rose-600 text-white text-[10px] font-bold rounded-lg shadow-sm">
+                            สินค้าหมด
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Product Details */}
-                    <div className="p-3 flex-1 flex flex-col justify-between">
-                      <div>
-                        <p className="text-[11px] font-mono text-slate-400 truncate">
-                          {p.barcode || '#-'}
-                        </p>
-                        <h3 className="font-semibold text-xs text-slate-800 line-clamp-2 mt-0.5 leading-snug">
+                    <div className="mt-3 flex-1 flex flex-col justify-between">
+                      <div className="flex items-start justify-between gap-1.5">
+                        <h3 className="font-semibold text-xs text-[#181A18] line-clamp-1 leading-snug group-hover:text-emerald-700 transition-colors">
                           {p.name}
                         </h3>
+                        <span className="font-bold text-xs text-[#181A18] font-mono shrink-0">
+                          ฿{Number(p.sell_price).toFixed(2)}
+                        </span>
                       </div>
 
-                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
-                        <div>
-                          <span className="text-xs text-slate-400 font-normal">ขาย</span>
-                          <span className="text-sm font-bold text-emerald-600 ml-1 font-mono">
-                            ฿{Number(p.sell_price).toFixed(2)}
-                          </span>
-                        </div>
-                        <span className="text-[11px] text-slate-400 font-normal font-mono">
+                      <div className="mt-1 flex items-center justify-between text-[11px] text-[#717672]">
+                        <span className="truncate">
+                          {p.category || 'ทั่วไป'} · {p.stock_qty} ชิ้น
+                        </span>
+                        <span className="text-[10px] text-[#8C948E] font-mono">
                           ทุน ฿{(p.cost_price || 0).toFixed(0)}
                         </span>
                       </div>
@@ -252,21 +271,26 @@ export default function CashierTab({
         </div>
       </div>
 
-      {/* RIGHT: CART CONSOLE (Exact Old Clean White Style) */}
-      <div className="w-96 bg-white border-l border-slate-200 flex flex-col shrink-0 select-none">
+      {/* 2. RIGHT CART PANEL: CURRENT ORDER */}
+      <div className="w-96 lg:w-[410px] bg-white border-l border-[#EAE7E1] flex flex-col shrink-0 select-none shadow-[-4px_0_16px_rgba(0,0,0,0.02)]">
         {/* Cart Header */}
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
-          <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-emerald-600" />
-            <h2 className="font-bold text-slate-800 text-sm">รายการสินค้าในตะกร้า</h2>
+        <div className="px-5 py-4 border-b border-[#EAE7E1] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <h2 className="font-bold text-sm text-[#181A18]">
+              รายการสั่งซื้อปัจจุบัน
+            </h2>
+            <span className="w-5 h-5 rounded-full bg-[#F7F6F2] border border-[#EAE7E1] text-[#181A18] text-[10px] font-bold flex items-center justify-center font-mono">
+              {totalItems}
+            </span>
           </div>
+
           {cart.length > 0 && (
             <button
               onClick={clearCart}
               type="button"
-              className="text-xs text-rose-500 hover:text-rose-700 font-medium transition-colors"
+              className="text-xs text-[#717672] hover:text-rose-600 font-medium transition-colors cursor-pointer"
             >
-              ล้างตะกร้า
+              ล้าง
             </button>
           )}
         </div>
@@ -274,65 +298,72 @@ export default function CashierTab({
         {/* Cart Item List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-400 py-12">
-              <ShoppingBag className="w-12 h-12 stroke-[1.5] mb-2 text-slate-200" />
-              <p className="text-sm font-medium">ตะกร้าว่างเปล่า</p>
-              <p className="text-xs text-slate-400 mt-1">คลิกสินค้าหรือยิงบาร์โค้ดเพื่อเพิ่มรายการ</p>
+            <div className="h-full flex flex-col items-center justify-center text-[#717672] py-16">
+              <ShoppingBag className="w-10 h-10 stroke-[1.5] mb-2 text-[#D5D2CB]" />
+              <p className="text-xs font-semibold text-[#181A18]">ไม่มีรายการในตะกร้า</p>
+              <p className="text-[11px] text-[#717672] mt-0.5">คลิกสินค้าหรือยิงบาร์โค้ดเพื่อเริ่มขาย</p>
             </div>
           ) : (
             cart.map((item) => (
               <div
                 key={item.product_id}
-                className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center gap-3 transition-colors hover:border-slate-300"
+                className="p-3 bg-[#F7F6F2] rounded-2xl border border-[#EAE7E1] flex items-center gap-3 transition-colors hover:border-[#D5D2CB]"
               >
-                <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                {/* Thumbnail */}
+                <div className="w-12 h-12 rounded-xl bg-white border border-[#EAE7E1] overflow-hidden shrink-0 flex items-center justify-center">
                   {item.image_url ? (
                     <img src={item.image_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <Package className="w-5 h-5 text-slate-300" />
+                    <Package className="w-5 h-5 text-[#A6ADA8]" />
                   )}
                 </div>
 
+                {/* Info & Quantity Stepper */}
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-xs text-slate-800 truncate">{item.name}</h4>
-                  <div className="flex items-center justify-between mt-1 text-xs">
-                    <span className="text-slate-500 font-mono">
-                      ฿{item.unit_price.toFixed(2)} / ชิ้น
-                    </span>
-                    <span className="font-bold text-emerald-600 font-mono">
-                      ฿{item.subtotal.toFixed(2)}
-                    </span>
+                  <div className="flex items-start justify-between gap-1">
+                    <h4 className="font-semibold text-xs text-[#181A18] truncate leading-tight">
+                      {item.name}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => removeFromCart(item.product_id)}
+                      className="text-[#A6ADA8] hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
+                      title="ลบรายการ"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
 
-                  <div className="flex items-center justify-between mt-1.5">
-                    <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-1.5 py-0.5">
+                  <p className="text-[11px] text-[#717672] mt-0.5 font-mono">
+                    ฿{item.unit_price.toFixed(2)} ต่อชิ้น
+                  </p>
+
+                  <div className="flex items-center justify-between mt-2">
+                    {/* Stepper pill */}
+                    <div className="flex items-center bg-white border border-[#EAE7E1] rounded-lg px-1.5 py-0.5 shadow-2xs">
                       <button
                         onClick={() => updateCartQty(item.product_id, -1)}
-                        className="text-slate-500 hover:text-slate-800 p-0.5 transition-colors"
+                        className="text-[#717672] hover:text-[#181A18] p-1 transition-colors cursor-pointer"
                         type="button"
                       >
-                        <MinusCircle className="w-3.5 h-3.5" />
+                        <Minus className="w-3 h-3" />
                       </button>
-                      <span className="w-6 text-center text-xs font-semibold font-mono">
+                      <span className="w-6 text-center text-xs font-semibold font-mono text-[#181A18]">
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => updateCartQty(item.product_id, 1)}
-                        className="text-slate-500 hover:text-slate-800 p-0.5 transition-colors"
+                        className="text-[#717672] hover:text-[#181A18] p-1 transition-colors cursor-pointer"
                         type="button"
                       >
-                        <PlusCircle className="w-3.5 h-3.5" />
+                        <Plus className="w-3 h-3" />
                       </button>
                     </div>
 
-                    <button
-                      onClick={() => removeFromCart(item.product_id)}
-                      className="text-slate-400 hover:text-rose-500 p-1 transition-colors"
-                      type="button"
-                      title="ลบรายการนี้"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {/* Subtotal */}
+                    <span className="font-bold text-xs text-[#181A18] font-mono">
+                      ฿{item.subtotal.toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -340,86 +371,82 @@ export default function CashierTab({
           )}
         </div>
 
-        {/* Bottom Checkout & Accounting Section */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50/70 space-y-3 shrink-0">
-          {/* Price & Tax Breakdown */}
-          <div className="p-2.5 bg-white rounded-xl border border-slate-200 text-xs space-y-1 text-slate-600">
+        {/* Cart Bottom Checkout & Totals */}
+        <div className="p-5 border-t border-[#EAE7E1] bg-white space-y-4 shrink-0 shadow-xs">
+          {/* Price Breakdown */}
+          <div className="space-y-1.5 text-xs text-[#717672] font-sans">
             <div className="flex justify-between">
-              <span>จำนวนชิ้น:</span>
-              <span className="font-semibold text-slate-800 font-mono">{totalItems} ชิ้น</span>
+              <span>ยอดก่อนภาษี (Pre-VAT)</span>
+              <span className="font-mono text-[#181A18]">฿{preVatAmount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-[11px] text-slate-500">
-              <span>ก่อนภาษี (Pre-VAT):</span>
-              <span className="font-mono">฿{preVatAmount.toFixed(2)}</span>
+            <div className="flex justify-between">
+              <span>ภาษีมูลค่าเพิ่ม (VAT 7%)</span>
+              <span className="font-mono text-[#181A18]">฿{vatAmount.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-[11px] text-slate-500">
-              <span>ภาษีขาย VAT 7% (ภ.พ.30):</span>
-              <span className="font-mono">฿{vatAmount.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-[11px] text-emerald-700 font-medium pt-0.5 border-t border-slate-100">
-              <span>กำไรขั้นต้น (Order GP):</span>
-              <span className="font-mono">+฿{grossProfit.toFixed(2)} ({gpPercent}%)</span>
-            </div>
-
-            <div className="flex justify-between items-baseline pt-1.5 border-t border-slate-200">
-              <span className="font-bold text-slate-900 text-sm">ยอดสุทธิ:</span>
-              <span className="text-emerald-600 text-2xl font-bold font-mono">
+            <div className="pt-2 border-t border-[#EAE7E1] flex justify-between items-baseline">
+              <span className="text-sm font-bold text-[#181A18]">ยอดรวมสุทธิ (Total)</span>
+              <span className="text-2xl font-extrabold text-[#181A18] font-mono">
                 ฿{totalAmount.toFixed(2)}
               </span>
             </div>
           </div>
 
-          {/* Cash Tender & Change Due Calculator */}
-          <div className="p-2.5 bg-white rounded-xl border border-slate-200 space-y-2 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="text-slate-600 font-medium shrink-0">รับเงินมา:</span>
-              <input
-                type="number"
-                value={cashReceived}
-                onChange={(e) => setCashReceived(e.target.value)}
-                placeholder={totalAmount > 0 ? totalAmount.toFixed(2) : "0.00"}
-                className="w-full px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-mono text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 text-right"
-              />
-            </div>
-
-            <div className="grid grid-cols-4 gap-1">
+          {/* Quick Tender & Cash Input */}
+          <div className="pt-1 space-y-2">
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
               {getQuickTenderOptions().map((opt) => (
                 <button
                   key={opt}
                   type="button"
                   onClick={() => setCashReceived(opt.toString())}
-                  className="py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all font-mono border border-slate-200"
+                  className="px-2.5 py-1 bg-[#F7F6F2] hover:bg-[#EAE7E1] border border-[#EAE7E1] text-[#181A18] rounded-lg text-xs font-mono font-medium transition-colors cursor-pointer shrink-0"
                 >
-                  {opt === totalAmount ? `พอดี` : `฿${opt.toLocaleString('th-TH')}`}
+                  ฿{opt.toLocaleString()}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => setCashReceived(totalAmount.toString())}
+                className="px-2.5 py-1 bg-[#F7F6F2] hover:bg-[#EAE7E1] border border-[#EAE7E1] text-emerald-700 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0"
+              >
+                พอดี
+              </button>
             </div>
 
-            <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-              <span className="text-slate-600 font-medium">เงินทอน (Change Due):</span>
-              <span className="font-bold text-emerald-600 font-mono text-base">
-                ฿{changeDue.toFixed(2)}
-              </span>
+            <div className="relative">
+              <input
+                type="number"
+                value={cashReceived}
+                onChange={(e) => setCashReceived(e.target.value)}
+                placeholder="ระบุจำนวนเงินที่รับ (เช่น 500, 1000)"
+                className="w-full px-3.5 py-2 bg-[#F7F6F2] border border-[#EAE7E1] rounded-xl text-xs font-mono text-[#181A18] placeholder:text-[#8C948E] focus:outline-none focus:ring-2 focus:ring-[#181A18]/20 focus:border-[#181A18]"
+              />
+              {changeDue > 0 && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-emerald-600 font-mono">
+                  ทอน ฿{changeDue.toFixed(2)}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Finalize Button (Exact Green Style with F10) */}
-          <button
-            disabled={cart.length === 0}
-            onClick={onCheckout}
-            type="button"
-            className={`w-full py-3.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
-              cart.length > 0
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer shadow-emerald-600/20 active:scale-98'
-                : 'bg-slate-300 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <DollarSign className="w-4 h-4" />
-            <span>ชำระเงิน (฿{totalAmount.toFixed(2)})</span>
-            <kbd className="px-1.5 py-0.5 bg-black/20 text-white rounded text-[10px] font-mono ml-1">
-              F10
-            </kbd>
-          </button>
+          {/* Big Black CTA 'Charge' Button matching the mock-up */}
+          <div className="space-y-1 text-center">
+            <button
+              type="button"
+              onClick={onCheckout}
+              disabled={cart.length === 0}
+              className="w-full bg-[#181A18] hover:bg-[#2C302D] text-white rounded-2xl py-3.5 px-5 font-bold text-sm flex items-center justify-between shadow-md transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed group"
+            >
+              <span className="tracking-wide">คิดเงิน (ชำระเงิน)</span>
+              <div className="flex items-center gap-1.5 font-mono">
+                <span>฿{totalAmount.toFixed(2)}</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </button>
+            <p className="text-[10px] text-[#8C948E]">
+              กด Spacebar หรือ F10 เพื่อชำระเงินทันที
+            </p>
+          </div>
         </div>
       </div>
     </div>

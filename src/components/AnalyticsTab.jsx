@@ -331,21 +331,21 @@ export default function AnalyticsTab({
   };
 
   return (
-    <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif]">
+    <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif] bg-[#F7F6F2] select-none">
       {/* Header & Controls */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-xl lg:text-2xl font-bold text-[#181A18] tracking-tight">
             ภาพรวมกำไร-ขาดทุน & บัญชีต้นทุน FIFO
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[#717672] mt-1">
             วิเคราะห์ผลประกอบการ กำไรขั้นต้น และตัดสต็อกต้นทุน FIFO จากฐานข้อมูลจริง
           </p>
         </div>
 
         {/* Date Filter Pills & Export Trigger */}
         <div className="flex flex-wrap items-center gap-2.5">
-          <div className="inline-flex p-1 bg-slate-200/80 rounded-xl border border-slate-300/40">
+          <div className="inline-flex p-1 bg-white rounded-2xl border border-[#EAE7E1] shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
             {[
               { id: 'today', label: 'ยอดวันนี้' },
               { id: 'week', label: '7 วันนี้' },
@@ -358,10 +358,10 @@ export default function AnalyticsTab({
                   key={pill.id}
                   onClick={() => setReportTimeframe(pill.id)}
                   type="button"
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-white text-slate-900 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-[#181A18] text-white shadow-xs'
+                      : 'text-[#717672] hover:text-[#181A18]'
                   }`}
                 >
                   {pill.label}
@@ -372,7 +372,7 @@ export default function AnalyticsTab({
 
           <button
             onClick={handleExportCsv}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#181A18] hover:bg-[#2C302D] text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer"
             type="button"
             title="ส่งออกไฟล์รายงานเป็น Excel/CSV"
           >
@@ -385,20 +385,20 @@ export default function AnalyticsTab({
       {/* Top 4 Bento KPI Metric Cards */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Gross Sales */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">ยอดขายรวม (Gross Sales)</span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <span className="text-xs text-[#717672] font-medium">ยอดขายรวม (Gross Sales)</span>
+            <div className="w-8 h-8 rounded-xl bg-[#F7F6F2] border border-[#EAE7E1] text-[#181A18] flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <div className="my-2">
-            <div className="text-2xl font-bold text-slate-900 font-mono">
+          <div className="my-2.5">
+            <div className="text-2xl font-bold text-[#181A18] font-mono">
               ฿{grossSales.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="text-emerald-600 font-medium">
+          <div className="flex items-center justify-between text-xs text-[#8C948E]">
+            <span className="text-emerald-700 font-medium">
               {reportTimeframe === 'today' ? 'วันนี้' : reportTimeframe === 'week' ? '7 วันที่ผ่านมา' : reportTimeframe === 'month' ? 'เดือนนี้' : 'ยอดสะสมทั้งหมด'}
             </span>
             <span className="font-mono">{orderCount} บิลขาย</span>
@@ -406,57 +406,57 @@ export default function AnalyticsTab({
         </div>
 
         {/* Card 2: COGS FIFO */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">ต้นทุนขาย FIFO (COGS)</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <span className="text-xs text-[#717672] font-medium">ต้นทุนขาย FIFO (COGS)</span>
+            <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center">
               <Boxes className="w-4 h-4" />
             </div>
           </div>
-          <div className="my-2">
-            <div className="text-2xl font-bold text-slate-700 font-mono">
+          <div className="my-2.5">
+            <div className="text-2xl font-bold text-[#181A18] font-mono">
               ฿{totalCogs.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center justify-between text-xs text-[#8C948E]">
             <span>ต้นทุน {grossSales > 0 ? ((totalCogs / grossSales) * 100).toFixed(1) : 0}%</span>
             <span>เฉลี่ย ฿{avgTicket}/บิล</span>
           </div>
         </div>
 
         {/* Card 3: Gross Profit */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">กำไรขั้นต้น (Gross Profit)</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <span className="text-xs text-[#717672] font-medium">กำไรขั้นต้น (Gross Profit)</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="my-2">
-            <div className="text-2xl font-bold text-emerald-600 font-mono">
+          <div className="my-2.5">
+            <div className="text-2xl font-bold text-emerald-700 font-mono">
               ฿{grossProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span className="text-emerald-600 font-bold">อัตรากำไร GP {gpMargin}%</span>
+          <div className="flex items-center justify-between text-xs text-[#8C948E]">
+            <span className="text-emerald-700 font-bold">อัตรากำไร GP {gpMargin}%</span>
             <span>หักต้นทุนสินค้าจริง</span>
           </div>
         </div>
 
         {/* Card 4: Net Operating Profit */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">กำไรสุทธิ (Net Operating Profit)</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <span className="text-xs text-[#717672] font-medium">กำไรสุทธิ (Net Operating Profit)</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 flex items-center justify-center">
               <Award className="w-4 h-4" />
             </div>
           </div>
-          <div className="my-2">
-            <div className={`text-2xl font-bold font-mono ${netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+          <div className="my-2.5">
+            <div className={`text-2xl font-bold font-mono ${netProfit >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
               ฿{netProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center justify-between text-xs text-[#8C948E]">
             <span>หักค่าใช้จ่าย ฿{totalExpenses.toFixed(2)}</span>
             <span className="font-bold text-emerald-600 font-mono">Net {netMargin}%</span>
           </div>

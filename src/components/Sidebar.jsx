@@ -30,14 +30,14 @@ export default function Sidebar({
   onOpenStoreSettings = () => {}
 }) {
   return (
-    <aside className="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 border-r border-slate-800 select-none">
+    <aside className="w-64 bg-[#141715] text-[#A6ADA8] flex flex-col shrink-0 border-r border-[#232824] select-none font-['Prompt',sans-serif]">
       {/* Brand Header */}
       <div
         onClick={onOpenStoreSettings}
-        className="p-4 border-b border-slate-800 flex items-center gap-3 hover:bg-slate-800/60 transition-colors cursor-pointer group"
+        className="p-4 border-b border-[#232824] flex items-center gap-3 hover:bg-[#1A1F1B] transition-colors cursor-pointer group"
         title="คลิกเพื่อตั้งค่าชื่อร้านและโลโก้"
       >
-        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 shadow-md border border-slate-700/60 bg-slate-800 p-0.5 group-hover:border-emerald-500/60 transition-colors">
+        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 shadow-md border border-[#2D342F] bg-[#1A1F1B] p-0.5 group-hover:border-emerald-500/60 transition-colors">
           <img
             src={storeSettings?.logo_url || '/logo.png'}
             alt="Store Logo"
@@ -49,41 +49,41 @@ export default function Sidebar({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-1">
-            <h1 className="font-bold text-lg text-white tracking-wide truncate group-hover:text-emerald-400 transition-colors">
+            <h1 className="font-bold text-base text-white tracking-wide truncate group-hover:text-emerald-400 transition-colors">
               {storeSettings?.store_name || 'Pouch'}
             </h1>
-            <span className="opacity-0 group-hover:opacity-100 text-slate-400 group-hover:text-emerald-400 transition-opacity p-0.5">
+            <span className="opacity-0 group-hover:opacity-100 text-[#8C948E] group-hover:text-white transition-opacity p-0.5">
               <Pencil className="w-3.5 h-3.5" />
             </span>
           </div>
-          <p className="text-xs text-amber-400/80 truncate">
+          <p className="text-xs text-[#8C948E] truncate">
             {storeSettings?.store_subtitle || 'ระบบแคชเชียร์ & คลังสต็อก'}
           </p>
         </div>
       </div>
 
       {/* Barcode listener indicator */}
-      <div className="mx-4 my-3 px-3 py-2 bg-slate-800/80 rounded-lg flex items-center gap-2 border border-slate-700/60">
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span className="text-xs text-slate-300 font-medium">พร้อมยิงบาร์โค้ด USB</span>
+      <div className="mx-3.5 my-3 px-3 py-2 bg-[#1A1F1B] rounded-xl flex items-center gap-2 border border-[#232824]">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span className="text-xs text-[#A6ADA8] font-medium">พร้อมยิงบาร์โค้ด USB (F2)</span>
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-3 py-2 space-y-1.5 overflow-y-auto scrollbar-none">
+      <nav className="flex-1 px-3 py-1.5 space-y-1 overflow-y-auto scrollbar-none">
         {/* 1. ขายหน้าร้าน (Cashier) */}
         <button
           onClick={() => setActiveTab('pos')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
             activeTab === 'pos'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
-              : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
+              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
           }`}
         >
-          <ShoppingBag className="w-5 h-5 shrink-0" />
-          <span className="truncate">ขายหน้าร้าน (Cashier)</span>
+          <ShoppingBag className="w-4 h-4 shrink-0" />
+          <span className="truncate">ขายหน้าร้าน (POS)</span>
           {cartCount > 0 && (
-            <span className="ml-auto bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded-full text-xs">
+            <span className="ml-auto bg-white text-[#141715] font-bold px-2 py-0.5 rounded-full text-[10px]">
               {cartCount}
             </span>
           )}
@@ -93,13 +93,13 @@ export default function Sidebar({
         <button
           onClick={() => setActiveTab('inventory')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
             activeTab === 'inventory'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
-              : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
+              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
           }`}
         >
-          <Boxes className="w-5 h-5 shrink-0" />
+          <Boxes className="w-4 h-4 shrink-0" />
           <span className="truncate">คลังสินค้า &amp; ต้นทุน</span>
         </button>
 
@@ -107,13 +107,13 @@ export default function Sidebar({
         <button
           onClick={() => setActiveTab('accounting')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
             activeTab === 'accounting'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
-              : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
+              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
           }`}
         >
-          <BarChart3 className="w-5 h-5 shrink-0" />
+          <BarChart3 className="w-4 h-4 shrink-0" />
           <span className="truncate">ภาพรวมกำไร-ขาดทุน</span>
         </button>
 
@@ -121,16 +121,16 @@ export default function Sidebar({
         <button
           onClick={() => setActiveTab('receipts')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
             activeTab === 'receipts'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
-              : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
+              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
           }`}
         >
-          <Receipt className="w-5 h-5 shrink-0" />
+          <Receipt className="w-4 h-4 shrink-0" />
           <span className="truncate">ประวัติใบเสร็จดิจิทัล</span>
           {orderHistoryCount > 0 && (
-            <span className="ml-auto bg-slate-800 text-slate-300 font-semibold px-2 py-0.5 rounded-full text-xs">
+            <span className="ml-auto bg-[#232824] text-[#A6ADA8] font-semibold px-2 py-0.5 rounded-full text-[10px]">
               {orderHistoryCount}
             </span>
           )}
@@ -140,15 +140,15 @@ export default function Sidebar({
         <button
           onClick={() => setActiveTab('tax')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
             activeTab === 'tax'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30'
-              : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
+              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
           }`}
         >
-          <Landmark className="w-5 h-5 text-amber-400 shrink-0" />
+          <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
           <span className="truncate">บัญชีภาษี สรรพากร</span>
-          <span className="ml-auto bg-amber-400/20 text-amber-300 text-[10px] font-bold px-1.5 py-0.5 rounded">
+          <span className="ml-auto bg-amber-400/15 text-amber-300 text-[10px] font-bold px-1.5 py-0.5 rounded">
             ม.40(8)
           </span>
         </button>
@@ -156,15 +156,15 @@ export default function Sidebar({
 
       {/* VAT Progress Indicator in Sidebar Footer */}
       {taxSummary && (
-        <div className="p-4 bg-slate-950/70 border-t border-slate-800 text-xs space-y-2">
-          <div className="flex justify-between items-center text-[11px] text-slate-400">
+        <div className="p-3.5 bg-[#101412] border-t border-[#232824] text-xs space-y-2">
+          <div className="flex justify-between items-center text-[11px] text-[#8C948E]">
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
               <span>เกณฑ์ VAT 1.8M</span>
             </span>
             <span className="font-bold text-amber-400">{taxSummary.vat?.progress_percentage || 0}%</span>
           </div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+          <div className="w-full bg-[#1A1F1B] h-1.5 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-300 ${
                 taxSummary.vat?.is_required ? 'bg-rose-500' : 'bg-emerald-400'
@@ -172,7 +172,7 @@ export default function Sidebar({
               style={{ width: `${Math.min(100, taxSummary.vat?.progress_percentage || 0)}%` }}
             ></div>
           </div>
-          <p className="text-[10px] text-slate-500 truncate">
+          <p className="text-[10px] text-[#717872] truncate">
             {taxSummary.vat?.is_required
               ? 'เกินเกณฑ์ 1.8M ต้องจด VAT'
               : `ยอดขายปีนี้ ฿${(taxSummary.total_revenue || 0).toLocaleString()}`}
@@ -181,10 +181,10 @@ export default function Sidebar({
       )}
 
       {/* DATA MANAGEMENT (DEMO / CLEAR) */}
-      <div className="p-3 bg-slate-950/80 border-t border-slate-800 text-xs space-y-1.5">
-        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-slate-500 font-semibold px-1">
+      <div className="p-3 bg-[#101412] border-t border-[#232824] text-xs space-y-1.5">
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-[#717872] font-semibold px-1">
           <span className="flex items-center gap-1">
-            <Database className="w-3 h-3 text-slate-400" />
+            <Database className="w-3 h-3 text-[#8C948E]" />
             <span>ฐานข้อมูลระบบ</span>
           </span>
         </div>
@@ -192,7 +192,7 @@ export default function Sidebar({
           <button
             type="button"
             onClick={onLoadSeed}
-            className="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg flex items-center justify-center gap-1 font-medium text-[11px] transition-colors border border-slate-700/60"
+            className="py-1.5 px-2 bg-[#1A1F1B] hover:bg-[#222924] text-amber-300 rounded-lg flex items-center justify-center gap-1 font-medium text-[11px] transition-colors border border-[#232824] cursor-pointer"
             title="โหลดสินค้าตัวอย่าง 5 รายการ เพื่อทดสอบระบบ"
           >
             <Sparkles className="w-3 h-3 text-amber-400" />
@@ -201,7 +201,7 @@ export default function Sidebar({
           <button
             type="button"
             onClick={onClearData}
-            className="py-1.5 px-2 bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 rounded-lg flex items-center justify-center gap-1 font-medium text-[11px] transition-colors border border-slate-700/60"
+            className="py-1.5 px-2 bg-[#1A1F1B] hover:bg-rose-950/60 text-[#8C948E] hover:text-rose-300 rounded-lg flex items-center justify-center gap-1 font-medium text-[11px] transition-colors border border-[#232824] cursor-pointer"
             title="ล้างข้อมูลสินค้า ประวัติบิล และบัญชีทั้งหมด คืนค่าเริ่มต้น"
           >
             <RotateCcw className="w-3 h-3" />
@@ -211,19 +211,19 @@ export default function Sidebar({
       </div>
 
       {/* APP VERSION & AUTO-UPDATE FOOTER */}
-      <div className="p-3 bg-slate-950 border-t border-slate-800 text-xs flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-slate-400" title="เวอร์ชันปัจจุบันของโปรแกรม">
+      <div className="p-3 bg-[#0D100E] border-t border-[#232824] text-xs flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-[#8C948E]" title="เวอร์ชันปัจจุบันของโปรแกรม">
           <ArrowUpCircle className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="font-mono text-[11px] text-slate-300">v{appVersion}</span>
+          <span className="font-mono text-[11px] text-[#A6ADA8]">v{appVersion}</span>
         </div>
         <button
           type="button"
           onClick={onCheckUpdate}
           disabled={isCheckingUpdate}
-          className="py-1 px-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg flex items-center gap-1.5 text-[11px] font-medium transition-colors border border-slate-700/60 disabled:opacity-60 cursor-pointer"
+          className="py-1 px-2.5 bg-[#1A1F1B] hover:bg-[#222924] text-white rounded-lg flex items-center gap-1.5 text-[11px] font-medium transition-colors border border-[#232824] disabled:opacity-60 cursor-pointer"
           title="ตรวจหาเวอร์ชันใหม่จาก GitHub Releases"
         >
-          <RotateCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-emerald-400' : 'text-slate-400'}`} />
+          <RotateCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-emerald-400' : 'text-[#8C948E]'}`} />
           <span>{isCheckingUpdate ? 'กำลังเช็ค...' : 'ตรวจหาอัปเดต'}</span>
         </button>
       </div>

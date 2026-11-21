@@ -90,14 +90,14 @@ export default function ReceiptsTab({
   };
 
   return (
-    <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif]">
+    <div className="w-full p-4 lg:p-6 space-y-6 max-w-7xl mx-auto font-['Prompt',sans-serif] bg-[#F7F6F2] select-none">
       {/* Header Bar */}
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">
-            ประวัติใบเสร็จดิจิทัล & คลังบิลอิเล็กทรอนิกส์
+          <h1 className="text-xl lg:text-2xl font-bold text-[#181A18] tracking-tight">
+            ประวัติใบเสร็จดิจิทัล &amp; คลังบิลอิเล็กทรอนิกส์
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[#717672] mt-1">
             Digital Receipts Archive — บันทึกถาวรในเครื่องแบบ SQLite WAL ค้นหาย้อนหลัง พิมพ์ซ้ำ และออกใบกำกับภาษีอย่างย่อ (ABB)
           </p>
         </div>
@@ -105,10 +105,10 @@ export default function ReceiptsTab({
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={handleExportCsv}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm border border-slate-200 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#F7F6F2] text-[#181A18] text-xs font-semibold shadow-2xs border border-[#EAE7E1] transition-all cursor-pointer"
             type="button"
           >
-            <FileDown className="w-4 h-4 text-slate-500" />
+            <FileDown className="w-4 h-4 text-[#717672]" />
             <span>ดาวน์โหลด .CSV</span>
           </button>
           <button
@@ -116,7 +116,7 @@ export default function ReceiptsTab({
               if (activeOrder) onPrintThermal(activeOrder);
               else alert('กรุณาเลือกบิลเพื่อพิมพ์');
             }}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181A18] hover:bg-[#2C302D] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
             type="button"
           >
             <Printer className="w-4 h-4" />

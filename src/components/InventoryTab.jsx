@@ -86,31 +86,31 @@ export default function InventoryTab({
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 font-['Prompt',sans-serif]">
+    <div className="flex-1 flex flex-col overflow-hidden bg-[#F7F6F2] font-['Prompt',sans-serif] select-none">
       {/* Top Header & Search Bar */}
-      <div className="p-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0">
+      <div className="p-5 bg-white border-b border-[#EAE7E1] flex flex-wrap items-center justify-between gap-3 shadow-2xs shrink-0">
         <div className="flex items-center gap-3">
-          <h2 className="text-base font-bold text-slate-800">จัดการคลังสินค้า &amp; สต็อก</h2>
-          <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">
+          <h2 className="text-lg font-bold text-[#181A18]">จัดการคลังสินค้า &amp; สต็อก</h2>
+          <span className="text-xs bg-[#F7F6F2] border border-[#EAE7E1] text-[#717672] px-2.5 py-0.5 rounded-full font-medium">
             {products.length} รายการ
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <div className="relative w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#717672] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="ค้นหาสินค้า / บาร์โค้ด..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 placeholder:text-slate-400"
+              className="w-full pl-9 pr-8 py-2 bg-[#F7F6F2] border border-[#EAE7E1] rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#181A18]/20 focus:border-[#181A18] text-[#181A18] placeholder:text-[#8C948E]"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#717672] hover:text-[#181A18] cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -120,112 +120,112 @@ export default function InventoryTab({
           <button
             onClick={handleExportCsv}
             type="button"
-            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-200"
+            className="px-3.5 py-2 bg-white hover:bg-[#F7F6F2] text-[#181A18] rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-[#EAE7E1] cursor-pointer"
           >
-            <FileDown className="w-3.5 h-3.5 text-slate-500" />
+            <FileDown className="w-3.5 h-3.5 text-[#717672]" />
             <span>ส่งออก .CSV</span>
           </button>
 
           <button
             onClick={onOpenAddProduct}
             type="button"
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors active:scale-95"
+            className="bg-[#181A18] hover:bg-[#2C302D] text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>+ เพิ่มสินค้าใหม่ (คำนวณต้นทุน/กำไร)</span>
+            <span>+ เพิ่มสินค้าใหม่</span>
           </button>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-5">
         {/* 4 Bento Telemetry Cards */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {/* Card 1: Stock Value */}
-          <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200">
+          <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 font-medium">มูลค่าสินค้าในคลัง (FIFO)</span>
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <span className="text-xs text-[#717672] font-medium">มูลค่าสินค้าในคลัง (FIFO)</span>
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
                 <Wallet className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-2">
-              <span className="text-xl font-bold text-slate-900 tracking-tight font-mono">
+            <div className="mt-2.5">
+              <span className="text-xl font-bold text-[#181A18] tracking-tight font-mono">
                 ฿{totalStockValue.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
-            <div className="mt-1 flex items-center justify-between text-[11px] text-slate-400">
+            <div className="mt-1 flex items-center justify-between text-[11px] text-[#8C948E]">
               <span>ประเมินตามราคาต้นทุนจริง</span>
               <span className="font-semibold text-emerald-600 font-mono">100% Active</span>
             </div>
           </div>
 
           {/* Card 2: Total SKUs */}
-          <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200">
+          <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 font-medium">จำนวนสินค้าทั้งหมด</span>
-              <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700">
+              <span className="text-xs text-[#717672] font-medium">จำนวนสินค้าทั้งหมด</span>
+              <div className="w-8 h-8 rounded-xl bg-[#F7F6F2] border border-[#EAE7E1] flex items-center justify-center text-[#181A18]">
                 <Boxes className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-2">
-              <span className="text-xl font-bold text-slate-900 tracking-tight font-mono">
-                {totalSkus} <span className="text-xs font-normal text-slate-500">รายการ</span>
+            <div className="mt-2.5">
+              <span className="text-xl font-bold text-[#181A18] tracking-tight font-mono">
+                {totalSkus} <span className="text-xs font-normal text-[#717672]">รายการ</span>
               </span>
             </div>
-            <div className="mt-1 text-[11px] text-slate-400">
+            <div className="mt-1 text-[11px] text-[#8C948E]">
               <span>{categories.length - 1} หมวดหมู่ในระบบ</span>
             </div>
           </div>
 
           {/* Card 3: Low Stock Alerts */}
-          <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200">
+          <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 font-medium">สินค้าใกล้หมด (เตือนสต็อก)</span>
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${lowStockCount > 0 ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-400'}`}>
+              <span className="text-xs text-[#717672] font-medium">สินค้าใกล้หมด (เตือนสต็อก)</span>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${lowStockCount > 0 ? 'bg-amber-50 border border-amber-200/60 text-amber-600' : 'bg-[#F7F6F2] border border-[#EAE7E1] text-[#A6ADA8]'}`}>
                 <AlertTriangle className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-2">
-              <span className={`text-xl font-bold tracking-tight font-mono ${lowStockCount > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
-                {lowStockCount} <span className="text-xs font-normal text-slate-500">รายการ</span>
+            <div className="mt-2.5">
+              <span className={`text-xl font-bold tracking-tight font-mono ${lowStockCount > 0 ? 'text-amber-600' : 'text-[#181A18]'}`}>
+                {lowStockCount} <span className="text-xs font-normal text-[#717672]">รายการ</span>
               </span>
             </div>
-            <div className="mt-1 text-[11px] text-slate-400">
+            <div className="mt-1 text-[11px] text-[#8C948E]">
               <span>{lowStockCount > 0 ? 'ควรสั่งซื้อเพิ่มเข้าร้าน' : 'ระดับสต็อกเพียงพอทุกรายการ'}</span>
             </div>
           </div>
 
           {/* Card 4: Avg Margin */}
-          <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200">
+          <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500 font-medium">อัตรากำไรเฉลี่ย (GP)</span>
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <span className="text-xs text-[#717672] font-medium">อัตรากำไรเฉลี่ย (GP)</span>
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
                 <Percent className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-2">
-              <span className="text-xl font-bold text-emerald-600 tracking-tight font-mono">
-                {avgMargin}% <span className="text-xs font-normal text-slate-500">GP เฉลี่ย</span>
+            <div className="mt-2.5">
+              <span className="text-xl font-bold text-emerald-700 tracking-tight font-mono">
+                {avgMargin}% <span className="text-xs font-normal text-[#717672]">GP เฉลี่ย</span>
               </span>
             </div>
-            <div className="mt-1 text-[11px] text-slate-400">
+            <div className="mt-1 text-[11px] text-[#8C948E]">
               <span>คำนวณจากราคาขายและต้นทุน</span>
             </div>
           </div>
         </section>
 
-        {/* Category Pills Filter */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           {categories.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setSelectedCat(cat)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
                 selectedCat === cat
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  ? 'bg-[#181A18] text-white shadow-xs'
+                  : 'bg-white text-[#717672] hover:text-[#181A18] border border-[#EAE7E1]'
               }`}
             >
               {cat === 'all' ? 'ทั้งหมด' : cat}
@@ -233,10 +233,10 @@ export default function InventoryTab({
           ))}
         </div>
 
-        {/* Product Inventory Table (Clean White Card) */}
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-          <table className="w-full text-left text-xs text-slate-600">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold uppercase tracking-wider text-[11px]">
+        {/* Product Inventory Table (Clean White Minimal Card) */}
+        <div className="bg-white rounded-2xl border border-[#EAE7E1] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+          <table className="w-full text-left text-xs text-[#717672]">
+            <thead className="bg-[#F7F6F2] border-b border-[#EAE7E1] text-[#181A18] font-semibold uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="py-3 px-4">รูปภาพ</th>
                 <th className="py-3 px-4">บาร์โค้ด</th>
@@ -249,10 +249,10 @@ export default function InventoryTab({
                 <th className="py-3 px-4 text-center">บาร์โค้ด &amp; จัดการ</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#EAE7E1]">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400">
+                  <td colSpan={9} className="py-12 text-center text-[#717672]">
                     ไม่พบรายการสินค้าที่ค้นหา
                   </td>
                 </tr>
@@ -263,37 +263,37 @@ export default function InventoryTab({
                   const itemTotalCostValue = p.stock_qty * (p.cost_price || 0);
 
                   return (
-                    <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={p.id} className="hover:bg-[#FBFBFA] transition-colors">
                       <td className="py-2.5 px-4">
-                        <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-[#F7F6F2] border border-[#EAE7E1] overflow-hidden flex items-center justify-center shrink-0">
                           {p.image_url ? (
                             <img src={p.image_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <Package className="w-5 h-5 text-slate-300" />
+                            <Package className="w-5 h-5 text-[#A6ADA8]" />
                           )}
                         </div>
                       </td>
-                      <td className="py-2.5 px-4 font-mono font-medium text-slate-700">
+                      <td className="py-2.5 px-4 font-mono font-medium text-[#181A18]">
                         {p.barcode || '-'}
                       </td>
                       <td className="py-2.5 px-4">
-                        <div className="font-semibold text-slate-900">{p.name}</div>
-                        <span className="inline-block mt-0.5 px-2 py-0.5 bg-slate-100 rounded text-[10px] text-slate-500 font-medium border border-slate-200/60">
+                        <div className="font-semibold text-[#181A18]">{p.name}</div>
+                        <span className="inline-block mt-0.5 px-2 py-0.5 bg-[#F7F6F2] rounded text-[10px] text-[#717672] font-medium border border-[#EAE7E1]">
                           {p.category || 'ทั่วไป'}
                         </span>
                       </td>
-                      <td className="py-2.5 px-4 text-right font-medium text-slate-700 font-mono">
+                      <td className="py-2.5 px-4 text-right font-medium text-[#181A18] font-mono">
                         ฿{(p.cost_price || 0).toFixed(2)}
                         {p.pack_cost > 0 && (
-                          <div className="text-[10px] text-slate-400 font-sans">
+                          <div className="text-[10px] text-[#717672] font-sans">
                             (ลัง {p.pack_qty} ชิ้น / ฿{p.pack_cost})
                           </div>
                         )}
                       </td>
-                      <td className="py-2.5 px-4 text-right font-medium text-emerald-600 font-mono">
+                      <td className="py-2.5 px-4 text-right font-medium text-emerald-700 font-mono">
                         +฿{((p.sell_price || 0) - (p.cost_price || 0)).toFixed(2)}
                       </td>
-                      <td className="py-2.5 px-4 text-right font-bold text-slate-900 text-sm font-mono">
+                      <td className="py-2.5 px-4 text-right font-bold text-[#181A18] text-sm font-mono">
                         ฿{(p.sell_price || 0).toFixed(2)}
                       </td>
                       <td className="py-2.5 px-4 text-center">
@@ -302,14 +302,14 @@ export default function InventoryTab({
                             isOutOfStock
                               ? 'bg-rose-100 text-rose-700'
                               : isLowStock
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-emerald-100 text-emerald-700'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-emerald-100 text-emerald-800'
                           }`}
                         >
                           {p.stock_qty} ชิ้น
                         </span>
                       </td>
-                      <td className="py-2.5 px-4 text-right font-medium text-slate-700 font-mono">
+                      <td className="py-2.5 px-4 text-right font-medium text-[#181A18] font-mono">
                         ฿{itemTotalCostValue.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="py-2.5 px-4 text-center">
@@ -318,9 +318,9 @@ export default function InventoryTab({
                             onClick={() => onOpenBarcode(p)}
                             type="button"
                             title="ดาวน์โหลด / พิมพ์บาร์โค้ดติดสินค้า"
-                            className="px-2 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors border border-blue-200/60"
+                            className="px-2 py-1 bg-[#F7F6F2] text-[#181A18] hover:bg-[#EAE7E1] rounded-lg text-xs font-medium flex items-center gap-1 transition-colors border border-[#EAE7E1] cursor-pointer"
                           >
-                            <BarcodeIcon className="w-3.5 h-3.5" />
+                            <BarcodeIcon className="w-3.5 h-3.5 text-[#717672]" />
                             <span>บาร์โค้ด</span>
                           </button>
 
@@ -328,7 +328,7 @@ export default function InventoryTab({
                             onClick={() => onOpenRestock(p)}
                             type="button"
                             title="เติมสต็อกสินค้า"
-                            className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors border border-emerald-200/60"
+                            className="px-2 py-1 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors border border-emerald-200/60 cursor-pointer"
                           >
                             <PlusCircle className="w-3.5 h-3.5" />
                             <span>เติมของ</span>
@@ -338,7 +338,7 @@ export default function InventoryTab({
                             onClick={() => onOpenEditProduct(p)}
                             type="button"
                             title="แก้ไขข้อมูลสินค้า"
-                            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
+                            className="p-1.5 text-[#717672] hover:text-[#181A18] hover:bg-[#F7F6F2] rounded-lg transition-colors border border-[#EAE7E1] cursor-pointer"
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
@@ -347,7 +347,7 @@ export default function InventoryTab({
                             onClick={() => onDeleteProduct(p.id, p.name)}
                             type="button"
                             title="ลบสินค้านี้"
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-slate-200"
+                            className="p-1.5 text-[#717672] hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-[#EAE7E1] cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>

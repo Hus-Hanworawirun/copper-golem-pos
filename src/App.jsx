@@ -755,7 +755,7 @@ export default function App() {
   const categories = ['all', ...Array.from(new Set(products.map(p => p.category || 'ทั่วไป')))];
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden bg-slate-100 text-slate-800 antialiased font-['Prompt',sans-serif]">
+    <div className="h-screen w-screen flex overflow-hidden bg-[#F7F6F2] text-[#181A18] antialiased font-['Prompt',sans-serif]">
       {/* 1. LEFT SIDEBAR NAVIGATION */}
       <Sidebar
         activeTab={activeTab}
@@ -775,7 +775,7 @@ export default function App() {
       {/* 2. RIGHT MAIN CONTENT COLUMN */}
       <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden">
         {/* MAIN WORKSPACE */}
-        <main className="flex-1 min-h-0 overflow-y-auto bg-slate-100 flex flex-col">
+        <main className="flex-1 min-h-0 overflow-y-auto bg-[#F7F6F2] flex flex-col">
           {activeTab === 'pos' && (
             <CashierTab
               products={products}
@@ -793,6 +793,7 @@ export default function App() {
               setCashReceived={setCashReceived}
               onCheckout={handleCheckoutSubmit}
               onOpenAddProduct={() => openAddProductModal()}
+              storeSettings={storeSettings}
             />
           )}
 
