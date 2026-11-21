@@ -9,6 +9,7 @@ import ProductModal from './components/modals/ProductModal';
 import RestockModal from './components/modals/RestockModal';
 import BarcodeModal from './components/modals/BarcodeModal';
 import ReceiptModal from './components/modals/ReceiptModal';
+import UpdateModal from './components/modals/UpdateModal';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('pos'); // 'pos', 'inventory', 'accounting', 'receipts', 'tax'
@@ -16,6 +17,21 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  // App Version & Auto-Updater State
+  const [appVersion, setAppVersion] = useState('1.0.1');
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [updateState, setUpdateState] = useState({
+    status: 'idle',
+    version: '',
+    currentVersion: '1.0.1',
+    percent: 0,
+    speed: 0,
+    transferred: 0,
+    total: 0,
+    message: '',
+    isPackaged: false
+  });
 
   // POS State
   const [cart, setCart] = useState([]);
@@ -145,6 +161,100 @@ export default function App() {
     fetchAccountingData();
     fetchTaxData();
   }, []);
+
+  // Electron Auto-Updater Lifecycle
+  useEffect(() => {
+    if (window.electronAPI) {
+      window.electronAPI.getVersion().then((info) => {
+        if (info?.version) {
+          setAppVersion(info.version);
+          setUpdateState((prev) => ({
+            ...prev,
+            currentVersion: info.version,
+            isPackaged: info.isPackaged
+          }));
+        }
+      }).catch(() => {});
+
+      const unsubscribe = window.electronAPI.onUpdateStatus((data) => {
+        setUpdateState((prev) => ({
+          ...prev,
+          ...data
+        }));
+        if (['checking', 'available', 'downloading', 'downloaded', 'not-available', 'error'].includes(data.status)) {
+          setIsUpdateModalOpen(true);
+        }
+      });
+
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
+    }
+  }, []);
+
+  const handleCheckForUpdates = async () => {
+    setIsUpdateModalOpen(true);
+    setUpdateState((prev) => ({
+      ...prev,
+      status: 'checking',
+      percent: 0,
+      message: ''
+    }));
+
+    if (window.electronAPI) {
+      try {
+        await window.electronAPI.checkForUpdates();
+      } catch (err) {
+        setUpdateState((prev) => ({
+          ...prev,
+          status: 'error',
+          message: err.message
+        }));
+      }
+    } else {
+      // Mock Demo mode when in browser without Electron
+      setTimeout(() => {
+        setUpdateState((prev) => ({
+          ...prev,
+          status: 'available',
+          version: '1.0.2 (Web Demo)'
+        }));
+        let pct = 0;
+        const timer = setInterval(() => {
+          pct += 25;
+          if (pct <= 100) {
+            setUpdateState((prev) => ({
+              ...prev,
+              status: 'downloading',
+              percent: pct,
+              speed: 1024 * 1024 * 3.5,
+              transferred: pct * 450000,
+              total: 45000000
+            }));
+          }
+          if (pct >= 100) {
+            clearInterval(timer);
+            setTimeout(() => {
+              setUpdateState((prev) => ({
+                ...prev,
+                status: 'downloaded',
+                version: '1.0.2 (Web Demo)'
+              }));
+            }, 300);
+          }
+        }, 400);
+      }, 1000);
+    }
+  };
+
+  const handleRestartAndInstall = () => {
+    if (window.electronAPI) {
+      window.electronAPI.restartAndInstall();
+    } else {
+      alert('จำลองการรีสตาร์ตและติดตั้งเสร็จสมบูรณ์ (Web Demo)');
+      setIsUpdateModalOpen(false);
+    }
+  };
 
   // Reload tax when year or period changes
   useEffect(() => {
@@ -615,6 +725,9 @@ export default function App() {
         orderHistoryCount={orderHistory.length}
         onLoadSeed={handleLoadSeedData}
         onClearData={handleClearAllData}
+        appVersion={appVersion}
+        onCheckUpdate={handleCheckForUpdates}
+        isCheckingUpdate={updateState.status === 'checking'}
       />
 
       {/* 2. RIGHT MAIN CONTENT COLUMN */}
@@ -727,6 +840,14 @@ export default function App() {
           setCompletedOrder(null);
           setSelectedReceiptOrder(null);
         }}
+      />
+
+      <UpdateModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+        updateState={updateState}
+        onRestart={handleRestartAndInstall}
+        onCheckAgain={handleCheckForUpdates}
       />
     </div>
   );

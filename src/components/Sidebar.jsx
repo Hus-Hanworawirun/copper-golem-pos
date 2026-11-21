@@ -9,7 +9,9 @@ import {
   Database,
   Sparkles,
   RotateCcw,
-  ShieldCheck
+  ShieldCheck,
+  ArrowUpCircle,
+  RotateCw
 } from 'lucide-react';
 
 export default function Sidebar({
@@ -19,7 +21,10 @@ export default function Sidebar({
   onClearData,
   cartCount = 0,
   orderHistoryCount = 0,
-  taxSummary = null
+  taxSummary = null,
+  appVersion = '1.0.1',
+  onCheckUpdate = () => {},
+  isCheckingUpdate = false
 }) {
   return (
     <aside className="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 border-r border-slate-800 select-none">
@@ -186,6 +191,24 @@ export default function Sidebar({
             <span>ล้างระบบ</span>
           </button>
         </div>
+      </div>
+
+      {/* APP VERSION & AUTO-UPDATE FOOTER */}
+      <div className="p-3 bg-slate-950 border-t border-slate-800 text-xs flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-slate-400" title="เวอร์ชันปัจจุบันของโปรแกรม">
+          <ArrowUpCircle className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="font-mono text-[11px] text-slate-300">v{appVersion}</span>
+        </div>
+        <button
+          type="button"
+          onClick={onCheckUpdate}
+          disabled={isCheckingUpdate}
+          className="py-1 px-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg flex items-center gap-1.5 text-[11px] font-medium transition-colors border border-slate-700/60 disabled:opacity-60 cursor-pointer"
+          title="ตรวจหาเวอร์ชันใหม่จาก GitHub Releases"
+        >
+          <RotateCw className={`w-3 h-3 ${isCheckingUpdate ? 'animate-spin text-emerald-400' : 'text-slate-400'}`} />
+          <span>{isCheckingUpdate ? 'กำลังเช็ค...' : 'ตรวจหาอัปเดต'}</span>
+        </button>
       </div>
     </aside>
   );

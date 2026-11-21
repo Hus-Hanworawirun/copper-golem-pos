@@ -25,6 +25,7 @@
       "server/**/*",
       "uploads/**/*",
       "electron-main.js",
+      "preload.js",
       "package.json"
     ],
     "win": {
@@ -55,13 +56,13 @@
       {
         "provider": "github",
         "owner": "Hus-Hanworawirun",
-        "repo": "copper-golem-pos"
+        "repo": "pouch"
       }
     ]
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hus-Hanworawirun/copper-golem-pos.git"
+    "url": "https://github.com/Hus-Hanworawirun/pouch.git"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 
@@ -8,41 +8,131 @@ let mainWindow;
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
 
+function sendUpdateStatus(status, data = {}) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('update-status', {
+      status,
+      ...data,
+      currentVersion: app.getVersion(),
+      isPackaged: app.isPackaged
+    });
+  }
+}
+
 function setupAutoUpdater() {
-  // Only check for updates when packaged as an executable
-  if (!app.isPackaged) return;
+  autoUpdater.on('checking-for-update', () => {
+    sendUpdateStatus('checking');
+  });
 
   autoUpdater.on('update-available', (info) => {
-    console.log('Update found:', info.version);
+    sendUpdateStatus('available', {
+      version: info.version,
+      releaseDate: info.releaseDate,
+      releaseNotes: info.releaseNotes
+    });
+  });
+
+  autoUpdater.on('update-not-available', (info) => {
+    sendUpdateStatus('not-available', {
+      version: info?.version || app.getVersion()
+    });
+  });
+
+  autoUpdater.on('download-progress', (progress) => {
+    sendUpdateStatus('downloading', {
+      percent: Math.round(progress.percent || 0),
+      speed: progress.bytesPerSecond,
+      transferred: progress.transferred,
+      total: progress.total
+    });
   });
 
   autoUpdater.on('update-downloaded', (info) => {
-    dialog.showMessageBox({
-      type: 'info',
-      title: 'อัปเดตเวอร์ชันใหม่สำเร็จ',
-      message: `ดาวน์โหลดเวอร์ชัน ${info.version} เรียบร้อยแล้ว`,
-      detail: 'คุณต้องการรีสตาร์ตโปรแกรมเพื่อติดตั้งเวอร์ชันใหม่ทันทีหรือไม่?',
-      buttons: ['รีสตาร์ตทันที', 'ไว้ภายหลัง'],
-      defaultId: 0,
-      cancelId: 1
-    }).then((res) => {
-      if (res.response === 0) {
-        autoUpdater.quitAndInstall();
-      }
+    sendUpdateStatus('downloaded', {
+      version: info.version
     });
   });
 
   autoUpdater.on('error', (err) => {
-    console.warn('AutoUpdater notice:', err.message);
+    sendUpdateStatus('error', {
+      message: err.message
+    });
   });
 
-  // Check for updates 3 seconds after application startup
-  setTimeout(() => {
-    autoUpdater.checkForUpdatesAndNotify().catch((err) => {
-      console.warn('Check for updates skipped:', err.message);
-    });
-  }, 3000);
+  // Only auto-check on startup if packaged
+  if (app.isPackaged) {
+    setTimeout(() => {
+      autoUpdater.checkForUpdatesAndNotify().catch((err) => {
+        console.warn('Check for updates skipped:', err.message);
+      });
+    }, 3000);
+  }
 }
+
+// IPC Handlers
+ipcMain.handle('get-app-version', () => {
+  return {
+    version: app.getVersion(),
+    isPackaged: app.isPackaged
+  };
+});
+
+ipcMain.handle('check-for-updates', async () => {
+  if (!app.isPackaged) {
+    // In Dev Mode: Simulate update flow for testing UI and progress bar
+    sendUpdateStatus('checking');
+    setTimeout(() => {
+      sendUpdateStatus('available', {
+        version: '1.0.2 (Dev Demo)',
+        releaseNotes: 'ทดสอบระบบอัปเดตอัตโนมัติในโหมดจำลอง Development'
+      });
+
+      let pct = 0;
+      const interval = setInterval(() => {
+        pct += 25;
+        if (pct <= 100) {
+          sendUpdateStatus('downloading', {
+            percent: pct,
+            speed: 1024 * 1024 * 3.2,
+            transferred: pct * 450000,
+            total: 45000000
+          });
+        }
+        if (pct >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            sendUpdateStatus('downloaded', {
+              version: '1.0.2 (Dev Demo)'
+            });
+          }, 300);
+        }
+      }, 400);
+    }, 1000);
+
+    return { status: 'dev-mode-simulated' };
+  }
+
+  try {
+    const result = await autoUpdater.checkForUpdates();
+    return { status: 'ok', result };
+  } catch (err) {
+    sendUpdateStatus('error', { message: err.message });
+    return { status: 'error', message: err.message };
+  }
+});
+
+ipcMain.handle('restart-and-install', () => {
+  if (app.isPackaged) {
+    autoUpdater.quitAndInstall();
+  } else {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'โหมดจำลอง (Dev Mode)',
+      message: 'จำลองการรีสตาร์ตและติดตั้งเวอร์ชันใหม่เสร็จสมบูรณ์',
+      detail: 'ในไฟล์ติดตั้งจริง (.exe) โปรแกรมจะปิดและเริ่มใหม่เพื่ออัปเดตเป็นเวอร์ชันล่าสุดทันที'
+    });
+  }
+});
 
 // Boot Express backend server within the Electron process
 try {
@@ -62,7 +152,8 @@ function createWindow() {
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
