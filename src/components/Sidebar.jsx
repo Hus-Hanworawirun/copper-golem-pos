@@ -144,13 +144,8 @@ export default function Sidebar({
               : 'bg-transparent border-2 border-transparent text-[#8C948E] hover:text-[#E2DDD0] hover:bg-[#181E1A]'
           }`}
         >
-          <Landmark className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'tax' ? 'text-amber-300' : 'text-amber-400'}`} />
+          <Landmark className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'tax' ? 'text-[#F7F6F2]' : 'text-[#8C948E]'}`} />
           <span className="truncate">บัญชีภาษี สรรพากร</span>
-          <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors ${
-            activeTab === 'tax' ? 'bg-amber-400/30 text-amber-200' : 'bg-amber-400/15 text-amber-300'
-          }`}>
-            ม.40(8)
-          </span>
         </button>
       </nav>
 
