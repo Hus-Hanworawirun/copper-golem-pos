@@ -128,72 +128,52 @@ export default function ReceiptsTab({
       {/* 4 KPI Metric Cards */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <span className="text-xs text-slate-500 font-medium">
-                ใบเสร็จ ({dateFilter === 'today' ? 'วันนี้' : dateFilter === '7days' ? '7 วัน' : 'ทั้งหมด'})
-              </span>
-              <div className="text-2xl font-bold text-slate-900 mt-1 font-mono">
-                {totalBills} <span className="text-sm font-normal text-slate-400">บิล</span>
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-              <Receipt className="w-4 h-4" />
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
+          <div>
+            <span className="text-xs text-[#717672] font-medium block">
+              ใบเสร็จ ({dateFilter === 'today' ? 'วันนี้' : dateFilter === '7days' ? '7 วัน' : 'ทั้งหมด'})
+            </span>
+            <div className="text-2xl font-bold text-[#181A18] mt-1 font-mono">
+              {totalBills} <span className="text-sm font-normal text-[#717672]">บิล</span>
             </div>
           </div>
-          <div className="mt-3 text-xs text-emerald-600 font-medium flex items-center gap-1">
+          <div className="mt-3 text-xs text-emerald-700 font-medium flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             <span>Local SQLite Active</span>
           </div>
         </div>
 
         {/* Card 2 */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <span className="text-xs text-slate-500 font-medium">ยอดขายรวมบิลที่ค้นพบ</span>
-              <div className="text-2xl font-bold text-slate-900 mt-1 font-mono">
-                ฿{totalGross.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-              <Banknote className="w-4 h-4" />
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
+          <div>
+            <span className="text-xs text-[#717672] font-medium block">ยอดขายรวมบิลที่ค้นพบ</span>
+            <div className="text-2xl font-bold text-[#181A18] mt-1 font-mono">
+              ฿{totalGross.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="mt-3 text-xs text-slate-400">เฉลี่ย ฿{avgBill}/บิล</div>
+          <div className="mt-3 text-xs text-[#8C948E]">เฉลี่ย ฿{avgBill}/บิล</div>
         </div>
 
         {/* Card 3 */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <span className="text-xs text-slate-500 font-medium">กำไรขั้นต้นรวม (Gross Profit)</span>
-              <div className="text-2xl font-bold text-emerald-600 mt-1 font-mono">
-                ฿{totalProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-              <TrendingUp className="w-4 h-4" />
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
+          <div>
+            <span className="text-xs text-[#717672] font-medium block">กำไรขั้นต้นรวม (Gross Profit)</span>
+            <div className="text-2xl font-bold text-emerald-700 mt-1 font-mono">
+              ฿{totalProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
-          <div className="mt-3 text-xs text-emerald-600 font-semibold font-mono">
+          <div className="mt-3 text-xs text-emerald-700 font-semibold font-mono">
             อัตรากำไรเฉลี่ย {avgProfitMargin}% GP
           </div>
         </div>
 
         {/* Card 4 */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <span className="text-xs text-slate-500 font-medium">สถานะฐานข้อมูล</span>
-              <div className="text-2xl font-bold text-slate-900 mt-1">100% Sync</div>
-            </div>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
+          <div>
+            <span className="text-xs text-[#717672] font-medium block">สถานะฐานข้อมูล</span>
+            <div className="text-2xl font-bold text-[#181A18] mt-1">100% Sync</div>
           </div>
-          <div className="mt-3 text-xs text-slate-400">Offline-First Engine</div>
+          <div className="mt-3 text-xs text-[#8C948E]">Offline-First Engine</div>
         </div>
       </section>
 

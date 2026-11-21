@@ -143,12 +143,7 @@ export default function InventoryTab({
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {/* Card 1: Stock Value */}
           <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-[#717672] font-medium">มูลค่าสินค้าในคลัง (FIFO)</span>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                <Wallet className="w-4 h-4" />
-              </div>
-            </div>
+            <span className="text-xs text-[#717672] font-medium block">มูลค่าสินค้าในคลัง (FIFO)</span>
             <div className="mt-2.5">
               <span className="text-xl font-bold text-[#181A18] tracking-tight font-mono">
                 ฿{totalStockValue.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -162,12 +157,7 @@ export default function InventoryTab({
 
           {/* Card 2: Total SKUs */}
           <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-[#717672] font-medium">จำนวนสินค้าทั้งหมด</span>
-              <div className="w-8 h-8 rounded-xl bg-[#F7F6F2] border border-[#EAE7E1] flex items-center justify-center text-[#181A18]">
-                <Boxes className="w-4 h-4" />
-              </div>
-            </div>
+            <span className="text-xs text-[#717672] font-medium block">จำนวนสินค้าทั้งหมด</span>
             <div className="mt-2.5">
               <span className="text-xl font-bold text-[#181A18] tracking-tight font-mono">
                 {totalSkus} <span className="text-xs font-normal text-[#717672]">รายการ</span>
@@ -180,12 +170,7 @@ export default function InventoryTab({
 
           {/* Card 3: Low Stock Alerts */}
           <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-[#717672] font-medium">สินค้าใกล้หมด (เตือนสต็อก)</span>
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${lowStockCount > 0 ? 'bg-amber-50 border border-amber-200/60 text-amber-600' : 'bg-[#F7F6F2] border border-[#EAE7E1] text-[#A6ADA8]'}`}>
-                <AlertTriangle className="w-4 h-4" />
-              </div>
-            </div>
+            <span className="text-xs text-[#717672] font-medium block">สินค้าใกล้หมด (เตือนสต็อก)</span>
             <div className="mt-2.5">
               <span className={`text-xl font-bold tracking-tight font-mono ${lowStockCount > 0 ? 'text-amber-600' : 'text-[#181A18]'}`}>
                 {lowStockCount} <span className="text-xs font-normal text-[#717672]">รายการ</span>
@@ -198,12 +183,7 @@ export default function InventoryTab({
 
           {/* Card 4: Avg Margin */}
           <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-[#717672] font-medium">อัตรากำไรเฉลี่ย (GP)</span>
-              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
-                <Percent className="w-4 h-4" />
-              </div>
-            </div>
+            <span className="text-xs text-[#717672] font-medium block">อัตรากำไรเฉลี่ย (GP)</span>
             <div className="mt-2.5">
               <span className="text-xl font-bold text-emerald-700 tracking-tight font-mono">
                 {avgMargin}% <span className="text-xs font-normal text-[#717672]">GP เฉลี่ย</span>

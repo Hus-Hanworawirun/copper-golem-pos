@@ -386,12 +386,7 @@ export default function AnalyticsTab({
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Gross Sales */}
         <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#717672] font-medium">ยอดขายรวม (Gross Sales)</span>
-            <div className="w-8 h-8 rounded-xl bg-[#F7F6F2] border border-[#EAE7E1] text-[#181A18] flex items-center justify-center">
-              <DollarSign className="w-4 h-4" />
-            </div>
-          </div>
+          <span className="text-xs text-[#717672] font-medium block">ยอดขายรวม (Gross Sales)</span>
           <div className="my-2.5">
             <div className="text-2xl font-bold text-[#181A18] font-mono">
               ฿{grossSales.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -407,12 +402,7 @@ export default function AnalyticsTab({
 
         {/* Card 2: COGS FIFO */}
         <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#717672] font-medium">ต้นทุนขาย FIFO (COGS)</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center">
-              <Boxes className="w-4 h-4" />
-            </div>
-          </div>
+          <span className="text-xs text-[#717672] font-medium block">ต้นทุนขาย FIFO (COGS)</span>
           <div className="my-2.5">
             <div className="text-2xl font-bold text-[#181A18] font-mono">
               ฿{totalCogs.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -426,12 +416,7 @@ export default function AnalyticsTab({
 
         {/* Card 3: Gross Profit */}
         <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#717672] font-medium">กำไรขั้นต้น (Gross Profit)</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-          </div>
+          <span className="text-xs text-[#717672] font-medium block">กำไรขั้นต้น (Gross Profit)</span>
           <div className="my-2.5">
             <div className="text-2xl font-bold text-emerald-700 font-mono">
               ฿{grossProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -445,12 +430,7 @@ export default function AnalyticsTab({
 
         {/* Card 4: Net Operating Profit */}
         <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[#717672] font-medium">กำไรสุทธิ (Net Operating Profit)</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 flex items-center justify-center">
-              <Award className="w-4 h-4" />
-            </div>
-          </div>
+          <span className="text-xs text-[#717672] font-medium block">กำไรสุทธิ (Net Operating Profit)</span>
           <div className="my-2.5">
             <div className={`text-2xl font-bold font-mono ${netProfit >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
               ฿{netProfit.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -588,13 +568,10 @@ export default function AnalyticsTab({
         </div>
 
         {/* Right 4 Cols: Top 5 Profit Champions */}
-        <div className="lg:col-span-4 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <span className="text-sm font-bold text-slate-900">5 อันดับสินค้าทำกำไรสูงสุด</span>
-              <span className="text-xs text-slate-500 block">Top Gross Profit Contributors</span>
-            </div>
-            <Award className="w-5 h-5 text-amber-500" />
+        <div className="lg:col-span-4 bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] flex flex-col justify-between">
+          <div className="mb-3">
+            <span className="text-sm font-bold text-[#181A18]">5 อันดับสินค้าทำกำไรสูงสุด</span>
+            <span className="text-xs text-[#717672] block">Top Gross Profit Contributors</span>
           </div>
 
           <div className="space-y-2.5 my-auto">
@@ -649,18 +626,13 @@ export default function AnalyticsTab({
       </section>
 
       {/* Condensed Real P&L Statement (งบกำไรขาดทุนย่อ) */}
-      <section className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-        <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Receipt className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="font-bold text-sm text-slate-900">งบกำไรขาดทุนย่อ (Condensed P&L Statement)</h3>
-              <p className="text-xs text-slate-500">สรุปรายได้ หักต้นทุน FIFO และค่าใช้จ่ายดำเนินงานจริง</p>
-            </div>
+      <section className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
+        <div className="flex items-center justify-between pb-3.5 border-b border-[#EAE7E1]">
+          <div>
+            <h3 className="font-bold text-sm text-[#181A18]">งบกำไรขาดทุนย่อ (Condensed P&L Statement)</h3>
+            <p className="text-xs text-[#717672]">สรุปรายได้ หักต้นทุน FIFO และค่าใช้จ่ายดำเนินงานจริง</p>
           </div>
-          <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-mono font-semibold">
+          <span className="px-3 py-1 rounded-full bg-[#F7F6F2] border border-[#EAE7E1] text-[#717672] text-xs font-mono font-semibold">
             {reportTimeframe === 'today' ? 'รายวัน' : reportTimeframe === 'week' ? 'สัปดาห์นี้' : reportTimeframe === 'month' ? 'รายเดือน' : 'สะสมทั้งหมด'}
           </span>
         </div>

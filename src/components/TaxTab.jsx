@@ -2,12 +2,8 @@ import React, { useState } from 'react';
 import {
   Printer,
   FileDown,
-  Gauge,
   ShieldCheck,
   AlertTriangle,
-  Calculator,
-  BookOpen,
-  PlusCircle,
   Save,
   Trash2,
   ThumbsUp,
@@ -148,20 +144,15 @@ export default function TaxTab({
       {/* VAT 1.8M Hero Telemetry Bar */}
       <section className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1] p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-              <Gauge className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-[#181A18]">
-                  เพดานภาษีมูลค่าเพิ่ม 1.8 ล้านบาท (VAT Threshold)
-                </span>
-              </div>
-              <span className="text-xs text-[#717672] block mt-0.5">
-                เกณฑ์ยื่นจดภาษีมูลค่าเพิ่ม (ภ.พ.01) เมื่อรายรับเกิน 1,800,000 บาท/ปี
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-[#181A18]">
+                เพดานภาษีมูลค่าเพิ่ม 1.8 ล้านบาท (VAT Threshold)
               </span>
             </div>
+            <span className="text-xs text-[#717672] block mt-0.5">
+              เกณฑ์ยื่นจดภาษีมูลค่าเพิ่ม (ภ.พ.01) เมื่อรายรับเกิน 1,800,000 บาท/ปี
+            </span>
           </div>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F7F6F2] border border-[#EAE7E1] text-xs shrink-0">
@@ -197,17 +188,12 @@ export default function TaxTab({
       </section>
 
       {/* PIT Estimator Dual Cards */}
-      <section className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-        <div className="flex items-center gap-2.5 pb-4 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <Calculator className="w-4 h-4" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-slate-900">
-              เปรียบเทียบการคำนวณภาษีบุคคลธรรมดา ม.40(8)
-            </h2>
-            <p className="text-xs text-slate-500">เลือกวิธีที่เสียภาษีน้อยที่สุดและถูกต้องตามกฎหมาย</p>
-          </div>
+      <section className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-[#EAE7E1]">
+        <div className="pb-4 border-b border-[#EAE7E1]">
+          <h2 className="text-sm font-bold text-[#181A18]">
+            เปรียบเทียบการคำนวณภาษีบุคคลธรรมดา ม.40(8)
+          </h2>
+          <p className="text-xs text-[#717672]">เลือกวิธีที่เสียภาษีน้อยที่สุดและถูกต้องตามกฎหมาย</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
@@ -298,7 +284,6 @@ export default function TaxTab({
       <section className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-emerald-600" />
             <h2 className="text-sm font-bold text-slate-900">
               สมุดบัญชีเงินสดรับ-จ่าย (แบบ ป.ส. 10 กรมสรรพากร)
             </h2>
@@ -330,7 +315,6 @@ export default function TaxTab({
           {/* OPEX Form (4 Cols) */}
           <div className="xl:col-span-4 bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 pb-2 border-b border-slate-200">
-              <PlusCircle className="w-4 h-4 text-emerald-600" />
               <span>บันทึกค่าใช้จ่ายร้าน (OPEX)</span>
             </div>
 

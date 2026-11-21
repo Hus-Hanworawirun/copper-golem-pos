@@ -9,7 +9,6 @@ import {
   Database,
   Sparkles,
   RotateCcw,
-  ShieldCheck,
   ArrowUpCircle,
   RotateCw,
   Pencil
@@ -153,10 +152,7 @@ export default function Sidebar({
       {taxSummary && (
         <div className="p-3.5 bg-[#101412] border-t border-[#232824] text-xs space-y-2">
           <div className="flex justify-between items-center text-[11px] text-[#8C948E]">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-              <span>เกณฑ์ VAT 1.8M</span>
-            </span>
+            <span>เกณฑ์ VAT 1.8M</span>
             <span className="font-bold text-amber-400">{taxSummary.vat?.progress_percentage || 0}%</span>
           </div>
           <div className="w-full bg-[#1A1F1B] h-1.5 rounded-full overflow-hidden">
