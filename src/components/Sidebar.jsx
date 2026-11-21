@@ -63,21 +63,23 @@ export default function Sidebar({
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-3 pt-3 pb-1.5 space-y-1 overflow-y-auto scrollbar-none">
+      <nav className="flex-1 px-3 pt-3 pb-1.5 space-y-1.5 overflow-y-auto scrollbar-none">
         {/* 1. ขายหน้าร้าน (Cashier) */}
         <button
           onClick={() => setActiveTab('pos')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs transition-all duration-200 ease-out cursor-pointer ${
             activeTab === 'pos'
-              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
-              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
+              ? 'bg-[#1E2520] border-2 border-[#D8D2BC] text-[#F7F6F2] font-semibold shadow-[0_2px_8px_rgba(0,0,0,0.25)]'
+              : 'bg-transparent border-2 border-transparent text-[#8C948E] hover:text-[#E2DDD0] hover:bg-[#181E1A]'
           }`}
         >
-          <ShoppingBag className="w-4 h-4 shrink-0" />
+          <ShoppingBag className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'pos' ? 'text-[#F7F6F2]' : 'text-[#8C948E]'}`} />
           <span className="truncate">ขายหน้าร้าน (POS)</span>
           {cartCount > 0 && (
-            <span className="ml-auto bg-white text-[#141715] font-bold px-2 py-0.5 rounded-full text-[10px]">
+            <span className={`ml-auto font-bold px-2 py-0.5 rounded-full text-[10px] transition-colors ${
+              activeTab === 'pos' ? 'bg-[#D8D2BC] text-[#141715]' : 'bg-[#232824] text-[#A6ADA8]'
+            }`}>
               {cartCount}
             </span>
           )}
@@ -87,13 +89,13 @@ export default function Sidebar({
         <button
           onClick={() => setActiveTab('inventory')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs transition-all duration-200 ease-out cursor-pointer ${
             activeTab === 'inventory'
-              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
-              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
+              ? 'bg-[#1E2520] border-2 border-[#D8D2BC] text-[#F7F6F2] font-semibold shadow-[0_2px_8px_rgba(0,0,0,0.25)]'
+              : 'bg-transparent border-2 border-transparent text-[#8C948E] hover:text-[#E2DDD0] hover:bg-[#181E1A]'
           }`}
         >
-          <Boxes className="w-4 h-4 shrink-0" />
+          <Boxes className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'inventory' ? 'text-[#F7F6F2]' : 'text-[#8C948E]'}`} />
           <span className="truncate">คลังสินค้า &amp; ต้นทุน</span>
         </button>
 
@@ -101,13 +103,13 @@ export default function Sidebar({
         <button
           onClick={() => setActiveTab('accounting')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs transition-all duration-200 ease-out cursor-pointer ${
             activeTab === 'accounting'
-              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
-              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
+              ? 'bg-[#1E2520] border-2 border-[#D8D2BC] text-[#F7F6F2] font-semibold shadow-[0_2px_8px_rgba(0,0,0,0.25)]'
+              : 'bg-transparent border-2 border-transparent text-[#8C948E] hover:text-[#E2DDD0] hover:bg-[#181E1A]'
           }`}
         >
-          <BarChart3 className="w-4 h-4 shrink-0" />
+          <BarChart3 className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'accounting' ? 'text-[#F7F6F2]' : 'text-[#8C948E]'}`} />
           <span className="truncate">ภาพรวมกำไร-ขาดทุน</span>
         </button>
 
@@ -115,16 +117,18 @@ export default function Sidebar({
         <button
           onClick={() => setActiveTab('receipts')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs transition-all duration-200 ease-out cursor-pointer ${
             activeTab === 'receipts'
-              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
-              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
+              ? 'bg-[#1E2520] border-2 border-[#D8D2BC] text-[#F7F6F2] font-semibold shadow-[0_2px_8px_rgba(0,0,0,0.25)]'
+              : 'bg-transparent border-2 border-transparent text-[#8C948E] hover:text-[#E2DDD0] hover:bg-[#181E1A]'
           }`}
         >
-          <Receipt className="w-4 h-4 shrink-0" />
+          <Receipt className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'receipts' ? 'text-[#F7F6F2]' : 'text-[#8C948E]'}`} />
           <span className="truncate">ประวัติใบเสร็จดิจิทัล</span>
           {orderHistoryCount > 0 && (
-            <span className="ml-auto bg-[#232824] text-[#A6ADA8] font-semibold px-2 py-0.5 rounded-full text-[10px]">
+            <span className={`ml-auto font-semibold px-2 py-0.5 rounded-full text-[10px] transition-colors ${
+              activeTab === 'receipts' ? 'bg-[#D8D2BC] text-[#141715]' : 'bg-[#232824] text-[#A6ADA8]'
+            }`}>
               {orderHistoryCount}
             </span>
           )}
@@ -134,15 +138,17 @@ export default function Sidebar({
         <button
           onClick={() => setActiveTab('tax')}
           type="button"
-          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all cursor-pointer ${
+          className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs transition-all duration-200 ease-out cursor-pointer ${
             activeTab === 'tax'
-              ? 'bg-[#222924] text-white border border-[#303832] shadow-xs'
-              : 'text-[#8C948E] hover:bg-[#1A1F1B] hover:text-white'
+              ? 'bg-[#1E2520] border-2 border-[#D8D2BC] text-[#F7F6F2] font-semibold shadow-[0_2px_8px_rgba(0,0,0,0.25)]'
+              : 'bg-transparent border-2 border-transparent text-[#8C948E] hover:text-[#E2DDD0] hover:bg-[#181E1A]'
           }`}
         >
-          <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
+          <Landmark className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'tax' ? 'text-amber-300' : 'text-amber-400'}`} />
           <span className="truncate">บัญชีภาษี สรรพากร</span>
-          <span className="ml-auto bg-amber-400/15 text-amber-300 text-[10px] font-bold px-1.5 py-0.5 rounded">
+          <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors ${
+            activeTab === 'tax' ? 'bg-amber-400/30 text-amber-200' : 'bg-amber-400/15 text-amber-300'
+          }`}>
             ม.40(8)
           </span>
         </button>
